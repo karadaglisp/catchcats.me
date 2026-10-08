@@ -356,7 +356,8 @@ section{padding-block:clamp(64px,10vw,112px)}
 @media (min-width:640px){.team-grid{grid-template-columns:repeat(2,1fr)}}
 .member{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--r-xl);padding:26px;display:flex;align-items:center;gap:18px}
 .member h3{font-size:20px;line-height:26px}
-.initials{flex:none;width:64px;height:64px;border-radius:50%;background:var(--action-primary);color:var(--on-action);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:22px}
+/* Cut-out portraits from lifepulse.gr/team, on the brand gold, cropped head and shoulders. */
+.avatar{flex:none;width:80px;height:80px;border-radius:50%;background:var(--action-primary);object-fit:cover}
 
 /* Contact form */
 .form{width:100%;max-width:520px;display:grid;gap:14px;text-align:left;margin-top:8px}
@@ -874,8 +875,8 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
       <h2 id="team-title">The people behind CatsMe.</h2>
     </div>
     <div class="team-grid">
-      <article class="member"><span class="initials" aria-hidden="true">PK</span><div><h3>Panos Karadaglis</h3><p class="muted">Product, design &amp; engineering</p></div></article>
-      <article class="member"><span class="initials" aria-hidden="true">KG</span><div><h3>Katerina Gianniki</h3><p class="muted">Graphic design</p></div></article>
+      <article class="member"><img class="avatar" src="assets/team/panos-karadaglis.png" alt="" width="240" height="240" loading="lazy"><div><h3>Panos Karadaglis</h3><p class="muted">Product, design &amp; engineering</p></div></article>
+      <article class="member"><img class="avatar" src="assets/team/katerina-gianniki.png" alt="" width="240" height="240" loading="lazy"><div><h3>Katerina Gianniki</h3><p class="muted">Graphic design</p></div></article>
     </div>
   </div>
 </section>
