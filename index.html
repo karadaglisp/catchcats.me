@@ -367,10 +367,23 @@ button.btn-quiet{background:none}
 .member-link{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:14px;font-weight:700;color:var(--ink-gold)}
 .member-link svg{width:15px;height:15px;flex:none}
 /* Cut-out portraits from lifepulse.gr/team, on the brand gold, cropped head and shoulders. */
-/* Real photos of the two of us, each with a street cat, dropped in a polaroid like Luna's. */
-.avatar{flex:none;width:112px;height:auto;border-radius:3px;box-shadow:0 10px 20px rgba(12,13,17,.28);background:#fbf8f3}
+/* Real photos of the two of us, each with a street cat, dropped in a polaroid like Luna's. Click to enlarge. */
+.avatar-btn{flex:none;padding:0;border:0;background:none;line-height:0;cursor:zoom-in;border-radius:4px}
+.avatar-btn:focus-visible{outline:3px solid var(--action-primary);outline-offset:4px}
+.avatar{display:block;width:132px;height:auto;border-radius:3px;box-shadow:0 10px 20px rgba(12,13,17,.28);background:#fbf8f3;transition:transform .15s ease,box-shadow .15s ease}
 .member:nth-child(1) .avatar{transform:rotate(-4deg)}
 .member:nth-child(2) .avatar{transform:rotate(3deg)}
+.avatar-btn:hover .avatar{transform:scale(1.04) rotate(0);box-shadow:0 16px 30px rgba(12,13,17,.34)}
+.member .bio{font-size:15px;line-height:21px;margin-top:4px;max-width:34ch}
+/* The photo preview overlay. */
+.lightbox{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(8,9,12,.82);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.lightbox[open]{display:flex}
+.lightbox img{max-width:min(440px,92vw);max-height:86vh;height:auto;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.lightbox-close{position:absolute;top:18px;right:18px;width:44px;height:44px;border:0;border-radius:50%;
+  background:rgba(245,240,232,.14);color:#f5f0e8;font:400 26px/1 var(--body);cursor:pointer}
+.lightbox-close:hover{background:rgba(245,240,232,.26)}
+.lightbox-close:focus-visible{outline:3px solid var(--action-primary);outline-offset:2px}
 
 /* Contact form */
 .form{width:100%;max-width:520px;display:grid;gap:14px;text-align:left;margin-top:8px}
@@ -905,11 +918,16 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
       <h2 id="team-title">The people behind CatsMe.</h2>
     </div>
     <div class="team-grid">
-      <article class="member"><img class="avatar" src="assets/team/panos-polaroid.png" alt="Panos holding up a rescued kitten" width="980" height="1100" loading="lazy"><div><h3>Panos Karadaglis</h3><p class="muted">Product, design &amp; engineering</p><a class="member-link" href="https://www.linkedin.com/in/panagiotis-karadaglis/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>LinkedIn</a></div></article>
-      <article class="member"><img class="avatar" src="assets/team/katerina-polaroid.png" alt="Katerina meeting a street cat" width="980" height="885" loading="lazy"><div><h3>Katerina Gianniki</h3><p class="muted">Graphic design</p><a class="member-link" href="https://www.instagram.com/katgiannik/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>Instagram</a></div></article>
+      <article class="member"><button type="button" class="avatar-btn" data-full="assets/team/panos-polaroid.png" aria-label="See Panos’s photo larger"><img class="avatar" src="assets/team/panos-polaroid.png" alt="Panos holding up a rescued kitten" width="980" height="1110" loading="lazy"></button><div><h3>Panos Karadaglis</h3><p class="muted">Product designer</p><p class="muted bio">3+ years of experience in UI/UX design and product development.</p><a class="member-link" href="https://www.linkedin.com/in/panagiotis-karadaglis/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>LinkedIn</a></div></article>
+      <article class="member"><button type="button" class="avatar-btn" data-full="assets/team/katerina-polaroid.png" aria-label="See Katerina’s photo larger"><img class="avatar" src="assets/team/katerina-polaroid.png" alt="Katerina meeting a street cat" width="980" height="895" loading="lazy"></button><div><h3>Katerina Gianniki</h3><p class="muted">Graphic designer</p><p class="muted bio">2+ years of experience in visual identities and layouts.</p><a class="member-link" href="https://www.instagram.com/katgiannik/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>Instagram</a></div></article>
     </div>
   </div>
 </section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview">
+  <button class="lightbox-close" type="button" id="lightbox-close" aria-label="Close preview">×</button>
+  <img id="lightbox-img" alt="">
+</div>
 
 <!-- ================= CONTACT ================= -->
 <section id="contact" class="final" aria-labelledby="join-title">
@@ -1351,6 +1369,22 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
   document.getElementById('send-another').addEventListener('click',function(){
     sent.hidden=true; form.hidden=false; say(''); form.elements.namedItem('name').focus();
   });
+})();
+</script>
+<script>
+/* Click a team polaroid to see it larger. */
+(function(){
+  var lb=document.getElementById('lightbox'), img=document.getElementById('lightbox-img');
+  if(!lb) return;
+  var opener=null;
+  function open(src,alt,btn){ img.src=src; img.alt=alt||''; opener=btn; lb.setAttribute('open',''); document.body.style.overflow='hidden'; document.getElementById('lightbox-close').focus(); }
+  function close(){ lb.removeAttribute('open'); img.removeAttribute('src'); document.body.style.overflow=''; if(opener) opener.focus(); }
+  document.querySelectorAll('.avatar-btn').forEach(function(b){
+    b.addEventListener('click',function(){ var im=b.querySelector('img'); open(b.getAttribute('data-full'), im&&im.alt, b); });
+  });
+  document.getElementById('lightbox-close').addEventListener('click',close);
+  lb.addEventListener('click',function(e){ if(e.target===lb) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&lb.hasAttribute('open')) close(); });
 })();
 </script>
 </body>
