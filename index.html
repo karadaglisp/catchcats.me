@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CatsMe</title>
+<meta name="description" content="Snap a stray cat, give it a name, keep it. When a neighbour has met the same cat, you agree on one name and become its koumbaroi.">
+<meta property="og:title" content="CatsMe - name the cats on your street">
+<meta property="og:description" content="Every street cat deserves a name.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://catchcats.me/">
+<meta property="og:image" content="https://catchcats.me/assets/icon-512.png">
+<link rel="canonical" href="https://catchcats.me/">
+<meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0d11" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Comfortaa:wght@500;700&family=Mynerve&display=swap">
+<style>
+/* =====================================================================
+   CATS ME design tokens - src/theme/tokens.ts, which is ported 1:1 from
+   the Figma "CATS ME Design System". Same hexes, same scales, same four
+   typefaces, and the site follows the system theme exactly like the app.
+   ===================================================================== */
+:root{
+  --bg-default:#f5f0e8; --bg-surface:#faf6ee; --bg-elevated:#e4ddd0;
+  --text-primary:#1a1810; --text-secondary:#6e6656;
+  --border-default:#e4ddd0; --border-strong:#b5a898;
+  --action-primary:#ecb72c; --action-hover:#f9cd47; --on-action:#020107;
+  /* Ink gold. On cream the brand gold is 1.6:1, so drawings and figures take the
+     paper ochre from Polaroid.tsx instead; on the dark ground they take goldBright. */
+  --ink-gold:#8a5c04;
+  --action-tint:#f9f0d0;
+  --grid:#e4ddd0;
+
+  --serif:'Source Serif 4', Georgia, serif;
+  --body:'Zen Maru Gothic', Verdana, sans-serif;
+  --label:'Comfortaa', Verdana, sans-serif;
+  --hand:'Mynerve', 'Brush Script MT', cursive;
+
+  --r-md:12px; --r-lg:16px; --r-xl:20px; --r-2xl:28px; --r-full:999px;
+  --gutter:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg-default:#0c0d11; --bg-surface:#1c1d24; --bg-elevated:#2e3040;
+    --text-primary:#f5f0e8; --text-secondary:#a89e8c;
+    --border-default:#2e3040; --border-strong:#4a4840;
+    --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040;
+  }
+}
+:root[data-theme="dark"]{
+  --bg-default:#0c0d11; --bg-surface:#1c1d24; --bg-elevated:#2e3040;
+  --text-primary:#f5f0e8; --text-secondary:#a89e8c;
+  --border-default:#2e3040; --border-strong:#4a4840;
+  --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+body{
+  margin:0;background:var(--bg-default);color:var(--text-primary);
+  font-family:var(--body);font-size:17px;line-height:26px;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%}
+img{height:auto}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding-inline:var(--gutter)}
+@media (min-width:720px){:root{--gutter:32px}}
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,7.4vw,74px);line-height:1.04;letter-spacing:-.015em}
+h2{font-size:clamp(30px,4.4vw,46px);line-height:1.12}
+h3{font-size:21px;line-height:27px;font-weight:600}
+p{margin:0}
+a{color:var(--ink-gold)}
+:focus-visible{outline:3px solid var(--action-primary);outline-offset:3px;border-radius:8px}
+.eyebrow{font-family:var(--label);font-weight:700;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-gold)}
+.lede{font-size:clamp(18px,2.2vw,21px);line-height:1.55}
+.muted{color:var(--text-secondary)}
+section{padding-block:clamp(64px,10vw,112px)}
+.section-head{display:flex;flex-direction:column;gap:14px;max-width:720px}
+
+/* ---------- buttons: the brand pill, and the one with cat ears ---------- */
+.btn{
+  position:relative;display:inline-flex;align-items:center;gap:10px;
+  padding:15px 28px;border-radius:var(--r-full);border:2px solid transparent;
+  font-family:var(--body);font-weight:700;font-size:16px;line-height:18px;text-decoration:none;
+  transition:background-color .15s ease, transform .15s ease;
+}
+.btn-primary{background:var(--action-primary);color:var(--on-action)}
+.btn-primary:hover{background:var(--action-hover)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-quiet{color:var(--text-primary);border-color:var(--border-strong)}
+.btn-quiet:hover{border-color:var(--text-secondary)}
+/* CatEarShape.tsx: two ears on the pill, tips leaning outward. Used sparingly, as in the app. */
+/* Τα αυτιά είναι position:absolute και δεν πιάνουν χώρο. ΚΑΝΕΝΑ margin εδώ: σε flex γραμμή με
+   align-items:center, ένα margin-top 11px κατέβαζε το κουμπί ~5,5px κάτω από το διπλανό του. */
+.ears::before,.ears::after{
+  content:"";position:absolute;top:-11px;width:28px;height:13px;background:inherit;
+}
+.ears::before{left:calc(20% - 14px);clip-path:polygon(0 100%,32% 0,100% 100%)}
+.ears::after{left:calc(80% - 14px);clip-path:polygon(0 100%,68% 0,100% 100%)}
+
+/* ---------- nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg-default) 86%, transparent);
+  backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--border-default);
+}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary)}
+.brand img{height:38px;width:auto;filter:drop-shadow(0 2px 5px rgba(12,13,17,.28))}
+.brand span{font-family:var(--serif);font-weight:700;font-size:21px;letter-spacing:.01em}
+.nav-links{display:none;gap:28px;font-size:15px}
+.nav-links a{color:var(--text-secondary);text-decoration:none}
+.nav-links a:hover{color:var(--text-primary)}
+@media (min-width:860px){.nav-links{display:flex}}
+.nav .btn{padding:10px 18px;font-size:14px}
+/* Smaller pill, smaller ears, so they stay inside the 64px bar. */
+.nav .ears::before,.nav .ears::after{top:-9px;width:22px;height:10px}
+.nav .ears::before{left:calc(20% - 11px)}
+.nav .ears::after{left:calc(80% - 11px)}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(40px,7vw,88px) clamp(64px,9vw,104px)}
+.hero-grid{display:grid;gap:clamp(36px,6vw,64px);align-items:center}
+@media (min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr}}
+.hero-copy{display:flex;flex-direction:column;gap:22px}
+.hero h1 em{font-style:normal;color:var(--ink-gold)}
+/* The last two lines take turns. All of them sit in one grid cell, so the hero never changes height. */
+.rot{display:grid}
+.rot-i{grid-area:1/1;transition:opacity .45s ease,transform .45s ease}
+.rot-i:not(.on){opacity:0;transform:translateY(.18em)}
+.hero .lede{max-width:33ch}
+/* The heart from the feed card, in the brand gold, set in the line like a word. */
+.heart-inline{display:inline-block;width:.95em;height:.95em;vertical-align:-.12em;margin-inline:.1em .15em;fill:var(--action-primary)}
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:6px}
+
+/* Photographs dropped on a table: the logo artwork on top, two of the app's own polaroids under it. */
+.table{position:relative;width:100%;max-width:520px;margin-inline:auto;aspect-ratio:1/1.02}
+/* On a phone the text comes first and the picture sits below it, smaller. */
+@media (max-width:899px){.table{max-width:300px}.hero-grid{gap:20px}}
+@media (max-width:520px){.eyebrow{letter-spacing:.2em}}
+.table > *{position:absolute}
+.pol-a{width:44%;left:2%;top:30%;transform:rotate(-11deg)}
+.pol-b{width:42%;right:0;top:4%;transform:rotate(9deg)}
+.luna{width:64%;left:21%;top:12%;margin:0;transform:rotate(-6deg);filter:drop-shadow(0 22px 34px rgba(12,13,17,.32));container-type:inline-size}
+.luna img{width:100%;height:auto}
+/* Under the picture, on the white lip (73.7–97.1% of the artwork's height, measured by
+   assets/logo-source/build_site_polaroid.py), lined up with the window's left edge. */
+.luna figcaption{position:absolute;left:16%;top:78%;font-family:var(--hand);font-size:12cqw;line-height:1;color:#4a4436}
+.pol-a,.pol-b{filter:drop-shadow(0 14px 22px rgba(12,13,17,.25))}
+.hand-note{display:flex;align-items:flex-end;gap:10px;font-family:var(--hand);font-size:clamp(22px,3vw,30px);color:var(--ink-gold);right:2%;bottom:5%;transform:rotate(-4deg);white-space:nowrap}
+.luna-mini{width:auto;height:1.25em;flex:none}
+
+/* ---------- problem ---------- */
+.problem{background:var(--bg-surface);border-block:1px solid var(--border-default)}
+.bars{display:flex;flex-direction:column;gap:22px;margin-top:40px}
+.bar-row{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:760px){.bar-row{grid-template-columns:230px 1fr;align-items:center;gap:24px}}
+.bar-label{font-family:var(--label);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary)}
+.bar-track{display:flex;align-items:center;gap:16px}
+.bar{height:46px;border-radius:10px}
+.bar.official{width:10.8%;min-width:30px;background:var(--action-primary)}
+/* Striped, because it is an estimate nobody has verified - solid would claim a measurement. */
+.bar.estimate{width:100%;border:2px solid var(--action-primary);
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--action-primary) 42%,transparent) 0 6px,transparent 6px 14px)}
+.bar-num{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1;white-space:nowrap}
+.estimate-num{margin-top:-6px}
+.problem-punch{margin-top:40px;font-size:clamp(20px,2.6vw,26px);line-height:1.45;max-width:46ch}
+.src{margin-top:18px;font-size:13px;line-height:20px;color:var(--text-secondary)}
+.src a{color:var(--text-secondary)}
+
+/* ---------- how it works: four screens from the app ---------- */
+.steps{display:grid;grid-template-columns:1fr;gap:56px 28px;margin-top:52px}
+@media (min-width:640px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1060px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step{display:flex;flex-direction:column;gap:20px}
+.phone{width:100%;max-width:290px;height:auto;margin-inline:auto;filter:drop-shadow(0 18px 30px rgba(12,13,17,.22))}
+.step-text{display:flex;gap:14px;align-items:center;max-width:320px;margin-inline:auto;width:100%}
+.step > .step-text{order:-1}
+.step-num{flex:none;width:42px;height:42px}
+.step-text h3{margin:0}
+.title-eye{display:inline-block;width:1.15em;height:1.04em;vertical-align:-.12em;margin-left:.15em;color:var(--ink-gold)}
+
+/* The screens respond. Everything that can be tapped is a real button with a keyboard path. */
+.phone .tap{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.phone .tap:focus{outline:none}
+.phone .tap:focus-visible .hit,.phone .tap:focus-visible .card-bg{stroke:#ffcb45;stroke-width:2.5}
+.phone .tap:focus-visible .hit-fill{stroke:#ffcb45;stroke-width:3}
+.pulse{transform-box:fill-box;transform-origin:center;opacity:0;pointer-events:none;animation:pulse 1.9s ease-out infinite}
+.done .pulse{display:none}
+@keyframes pulse{0%{opacity:.75;transform:scale(1)}100%{opacity:0;transform:scale(1.65)}}
+.fade{transition:opacity .25s ease}
+.springy{transform-box:fill-box;transform-origin:center}
+.springy.pop{animation:pop .38s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
+.invite .card-bg{animation:breathe 1.7s ease-in-out infinite}
+@keyframes breathe{0%,100%{stroke:#2e3040}50%{stroke:#ecb72c}}
+.phone-input{display:block;box-sizing:border-box;width:252px;height:46px;margin:6px;padding:0 14px;border-radius:12px;
+  border:1.5px solid #ecb72c;background:#1c1d24;color:#f5f0e8;caret-color:#ecb72c;font:16px/1 'Zen Maru Gothic',Verdana,sans-serif;outline:none}
+.phone-input:focus{box-shadow:0 0 0 3px rgba(236,183,44,.32)}
+.phone-input.invite{animation:glow 1.9s ease-out infinite}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(236,183,44,.55)}100%{box-shadow:0 0 0 7px rgba(236,183,44,0)}}
+
+/* SVG text inside the screens uses the app's own faces */
+.t-serif{font-family:var(--serif);font-weight:700}
+.t-body{font-family:var(--body)}
+.t-bold{font-family:var(--body);font-weight:700}
+.t-label{font-family:var(--label);font-weight:700;letter-spacing:.08em}
+.t-hand{font-family:var(--hand)}
+
+/* ---------- koumbaroi ---------- */
+.koum{background:var(--action-primary);color:#1a1810}
+.koum .eyebrow{color:#6b5008}
+.koum-grid{display:grid;gap:40px;align-items:center}
+@media (min-width:900px){.koum-grid{grid-template-columns:auto 1fr;gap:72px}}
+.crown{width:clamp(140px,22vw,220px);height:auto;margin-inline:auto}
+.koum p{color:#3d2f06}
+/* Two neighbours, two lanes, one meeting point. */
+.journey{display:grid;gap:14px;margin-top:48px;align-items:center}
+@media (min-width:900px){.journey{grid-template-columns:1fr 64px 1.05fr;gap:10px}}
+.lanes{display:flex;flex-direction:column;gap:14px}
+.lane{background:#faf6ee;border-radius:var(--r-xl);padding:20px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 24px rgba(61,47,6,.14)}
+.who{display:flex;gap:12px;align-items:center}
+.who .av{width:40px;height:40px;flex:none}
+.who b{display:block;font-size:16px;line-height:22px;color:#1a1810}
+.who small{display:block;font-size:13px;line-height:18px;color:#6e6656}
+.beats{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.beats li{display:inline-flex;gap:8px;align-items:center;font-size:15px;line-height:20px;color:#1a1810;background:#efe6d3;border-radius:var(--r-full);padding:7px 14px}
+.beats li svg{width:18px;height:18px;fill:#8a5c04;color:#8a5c04;flex:none}
+.beats li.to{background:none;padding:0;color:#6b5008;font-weight:700}
+.hand{font-family:var(--hand);font-size:1.3em;line-height:1}
+.merge{width:100%;height:auto}
+.merge-wide{display:none}
+.merge-tall{max-width:200px;margin-inline:auto}
+@media (min-width:900px){.merge-wide{display:block}.merge-tall{display:none}}
+.together{background:#0c0d11;color:#f5f0e8;border-radius:var(--r-2xl);padding:26px;display:flex;flex-direction:column;gap:16px;box-shadow:0 14px 30px rgba(12,13,17,.28)}
+.together .t-lab{font-family:var(--label);font-weight:700;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#ffcb45}
+.bond{display:flex;gap:16px;align-items:center}
+.bond .pair{width:112px;height:auto;flex:none}
+.together .bond p{color:#a89e8c;font-size:14px;line-height:21px}
+.bond b{display:block;font-family:var(--serif);font-weight:700;font-size:26px;line-height:32px;color:#ffcb45}
+.bond small{font-size:14px}
+.bond .hand{color:#f5f0e8}
+
+/* The scenario, played. JS adds .anim-ready (hidden start) only when motion is allowed,
+   then .play when the diagram scrolls into view. Without JS everything simply shows. */
+.journey.anim-ready .lane,.journey.anim-ready .together{opacity:0;transform:translateY(16px)}
+.journey.anim-ready .beats li{opacity:0;transform:translateX(-8px)}
+.journey.anim-ready .merge{opacity:0}
+.journey.anim-ready .bond{opacity:0}
+.journey.anim-ready .pa,.journey.anim-ready .crown-pop{transform-box:fill-box;transform-origin:center}
+.journey.anim-ready .pa-a{transform:translateX(-14px)}
+.journey.anim-ready .pa-b{transform:translateX(14px)}
+.journey.anim-ready .crown-pop{transform:scale(0)}
+.journey.play .lane,.journey.play .together,.journey.play .beats li,.journey.play .merge,.journey.play .bond{
+  opacity:1;transform:none;transition:opacity .5s ease var(--d,0s),transform .5s ease var(--d,0s)}
+.journey.play .pa{transform:none;transition:transform .6s cubic-bezier(.3,1.4,.5,1) var(--d,0s)}
+.journey.play .crown-pop{transform:scale(1);transition:transform .5s cubic-bezier(.3,1.7,.5,1) var(--d,0s)}
+.replay{display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:9px 16px;border-radius:var(--r-full);
+  border:1.5px solid rgba(26,24,16,.35);background:rgba(26,24,16,.08);color:#1a1810;font:700 13px/1 var(--label);cursor:pointer}
+.replay:hover{background:rgba(26,24,16,.14)}
+.replay svg{width:16px;height:16px;fill:currentColor}
+
+/* The sketch above the diagram. Base styles are the FINISHED scene (what no-JS and reduced-motion
+   readers see); .anim-ready rewinds it and .play runs it, on the same clock as the diagram. */
+.scene{display:block;width:100%;max-width:780px;height:auto;margin:44px auto 0;border-radius:24px;box-shadow:0 14px 30px rgba(12,13,17,.28)}
+.scene .pop,.scene .flash,.scene .zz{transform-box:fill-box;transform-origin:center}
+.scene .tag{transform-origin:center bottom}
+.scene .near-a{transform:translateX(110px)}
+.scene .near-b{transform:translateX(-110px)}
+.scene .tag-b,.scene .eye-b{opacity:0}
+.scene .tag-move{transform:translate(140px,-26px)}
+.scene .bond-arc{stroke-dasharray:100;stroke-dashoffset:0}
+.scene .flash{opacity:0}
+.scene .zz{animation:zz 2.6s ease-in-out infinite}
+.scene .zz2{animation-delay:.4s}
+.scene .zz3{animation-delay:.8s}
+@keyframes zz{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px);opacity:1}}
+.scene.anim-ready .fig-a{opacity:0;transform:translateX(-60px)}
+.scene.anim-ready .fig-b{opacity:0;transform:translateX(60px)}
+.scene.anim-ready .near-a,.scene.anim-ready .near-b{transform:none}
+.scene.anim-ready .pop{transform:scale(0)}
+.scene.anim-ready .tag-b,.scene.anim-ready .eye-b{opacity:1}
+.scene.anim-ready .tag-move{transform:none}
+.scene.anim-ready .bond-arc{stroke-dashoffset:100}
+.scene.play .fig-a,.scene.play .fig-b{opacity:1;transform:none;transition:opacity .5s ease var(--d,0s),transform .6s ease var(--d,0s)}
+.scene.play .near-a{transform:translateX(110px);transition:transform .9s cubic-bezier(.4,0,.2,1) var(--d,0s)}
+.scene.play .near-b{transform:translateX(-110px);transition:transform .9s cubic-bezier(.4,0,.2,1) var(--d,0s)}
+.scene.play .pop{transform:scale(1);transition:transform .5s cubic-bezier(.3,1.7,.5,1) var(--d,0s)}
+.scene.play .tag-b,.scene.play .eye-b{animation:loseName .6s ease 4.1s forwards}
+@keyframes loseName{to{opacity:0}}
+.scene.play .tag-move{transform:translate(140px,-26px);transition:transform .8s cubic-bezier(.4,0,.2,1) var(--d,0s)}
+.scene.play .bond-arc{stroke-dashoffset:0;transition:stroke-dashoffset .8s ease var(--d,0s)}
+.scene.play .flash{animation:flash .6s ease-out var(--d,0s) both}
+@keyframes flash{0%{opacity:0;transform:scale(.3)}25%{opacity:.95;transform:scale(1.15)}100%{opacity:0;transform:scale(1.6)}}
+
+/* ---------- mission ---------- */
+.mission{background:var(--bg-surface);border-block:1px solid var(--border-default)}
+.m-sub{margin-top:48px;font-size:22px;line-height:28px}
+.aims{display:grid;gap:18px;margin-top:20px}
+@media (min-width:760px){.aims{grid-template-columns:repeat(3,1fr)}}
+.aim{background:var(--bg-default);border:1px solid var(--border-default);border-radius:var(--r-xl);padding:26px;display:flex;flex-direction:column;gap:10px}
+.big-ico{width:64px;height:64px;border-radius:18px;background:var(--action-tint);display:grid;place-items:center;margin-bottom:6px}
+.big-ico svg{width:36px;height:36px;fill:var(--ink-gold)}
+.aim h3{font-size:20px;line-height:26px}
+.aim p{font-size:15px;line-height:23px;color:var(--text-secondary)}
+
+/* Screens from the app, inside Our mission */
+.screens{display:grid;gap:40px 28px;margin-top:48px}
+@media (min-width:640px){.screens{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:960px){.screens{grid-template-columns:repeat(3,1fr)}}
+.screen{display:flex;flex-direction:column;gap:16px;align-items:center}
+.screen h3{font-size:20px;line-height:26px;text-align:center}
+.nudge .lead{animation:breathe 1.7s ease-in-out infinite}
+.phone .tap[aria-disabled="true"]{cursor:default}
+.phone .tap:focus-visible .ring{stroke:#f5f0e8;stroke-width:2.5}
+.floaty{transform-box:fill-box;transform-origin:center}
+
+/* Where we're going: a timeline of goals by period. Vertical on a phone, horizontal from 760px. */
+.timeline{list-style:none;margin:36px 0 0;padding:0;position:relative;display:flex;flex-direction:column;gap:30px;max-width:640px}
+.timeline::before{content:"";position:absolute;left:27px;top:28px;bottom:28px;width:3px;border-radius:2px;background:var(--border-strong)}
+.tl-item{position:relative;display:flex;gap:20px;align-items:flex-start}
+.tl-dot{flex:none;width:56px;height:56px;border-radius:50%;background:var(--action-primary);display:grid;place-items:center;position:relative;z-index:1;box-shadow:0 0 0 6px var(--bg-surface)}
+.tl-dot svg{width:28px;height:28px;fill:var(--on-action)}
+.tl-period{display:block;font-family:var(--label);font-weight:700;font-size:12px;line-height:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-gold);margin-top:6px}
+.tl-item h3{font-size:20px;line-height:26px;margin-top:6px}
+.tl-item p{font-size:15px;line-height:23px;color:var(--text-secondary);margin-top:4px}
+@media (min-width:760px){
+  .timeline{flex-direction:row;max-width:none;gap:24px;margin-top:44px}
+  .timeline::before{left:calc(100% / 6);right:calc(100% / 6);top:28px;bottom:auto;width:auto;height:3px}
+  .tl-item{flex:1;flex-direction:column;align-items:center;text-align:center;gap:14px}
+  .tl-item > div{display:flex;flex-direction:column;align-items:center}
+  .tl-item p{max-width:28ch}
+  .tl-period{margin-top:0}
+}
+
+/* ---------- final cta ---------- */
+.final{text-align:center}
+.final .wrap{display:flex;flex-direction:column;align-items:center;gap:18px}
+.final .mascot{width:120px;height:auto}
+.final h2{max-width:20ch}
+.final .lede{max-width:46ch}
+.sign{font-family:var(--hand);font-size:clamp(28px,5vw,42px);line-height:1.2;color:var(--ink-gold);margin-top:18px}
+
+/* Back to the top: the brand pill reduced to a cat's head. Appears after the first screenful. */
+.to-top{position:fixed;right:18px;bottom:20px;z-index:30;width:56px;height:64px;display:block;color:var(--on-action);
+  filter:drop-shadow(0 10px 18px rgba(12,13,17,.35));
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.to-top.show,.to-top:focus-visible{opacity:1;transform:none;pointer-events:auto}
+.to-top svg{display:block;width:100%;height:100%}
+.to-top .head{fill:var(--action-primary);transition:fill .15s ease}
+.to-top:hover .head{fill:var(--action-hover)}
+.to-top:focus-visible{outline:none}
+.to-top:focus-visible .rim{fill:#ffcb45;stroke:#ffcb45}
+footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:14px;color:var(--text-secondary)}
+.foot{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
+.foot .brand span{font-size:18px}
+.foot .brand img{height:30px;width:auto}
+</style>
+</head>
+<body>
+
+<!-- Shared drawings: Phosphor icons (the same set the app uses), in their 256 grid. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="av-clip"><circle cx="20" cy="20" r="19"/></clipPath>
+    <symbol id="av-stick" viewBox="0 0 40 40"><g clip-path="url(#av-clip)" fill="none" stroke="#1a1810" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="14.5" r="6"/><path d="M20 20.5V41M20 26l-8 7M20 26l8 7"/></g></symbol>
+    <path id="i-heart" d="M178 40c-20.65 0-38.73 8.88-50 23.89C116.73 48.88 98.65 40 78 40a62.07 62.07 0 0 0-62 62c0 70 103.79 126.66 108.21 129a8 8 0 0 0 7.58 0C136.21 228.66 240 172 240 102a62.07 62.07 0 0 0-62-62m-50 174.8c-18.26-10.64-96-59.11-96-112.8a46.06 46.06 0 0 1 46-46c19.45 0 35.78 10.36 42.6 27a8 8 0 0 0 14.8 0c6.82-16.67 23.15-27 42.6-27a46.06 46.06 0 0 1 46 46c0 53.61-77.76 102.15-96 112.8"/>
+    <path id="i-heart-fill" d="M240 102c0 70-103.79 126.66-108.21 129a8 8 0 0 1-7.58 0C119.79 228.66 16 172 16 102a62.07 62.07 0 0 1 62-62c20.65 0 38.73 8.88 50 23.89C139.27 48.88 157.35 40 178 40a62.07 62.07 0 0 1 62 62"/>
+    <path id="i-crown" d="M248 80a28 28 0 1 0-51.12 15.77l-26.79 33L146 73.4a28 28 0 1 0-36.06 0l-24.03 55.34-26.79-33a28 28 0 1 0-26.6 12L47 194.63A16 16 0 0 0 62.78 208h130.44A16 16 0 0 0 209 194.63l14.47-86.85A28 28 0 0 0 248 80M128 40a12 12 0 1 1-12 12 12 12 0 0 1 12-12M24 80a12 12 0 1 1 12 12 12 12 0 0 1-12-12m196 12a12 12 0 1 1 12-12 12 12 0 0 1-12 12"/>
+    <path id="i-handheart" d="M230.33 141.06a24.34 24.34 0 0 0-18.61-4.77C230.5 117.33 240 98.48 240 80c0-26.47-21.29-48-47.46-48A47.58 47.58 0 0 0 156 48.75 47.58 47.58 0 0 0 119.46 32C93.29 32 72 53.53 72 80c0 11 3.24 21.69 10.06 33a31.87 31.87 0 0 0-14.75 8.4L44.69 144H16a16 16 0 0 0-16 16v40a16 16 0 0 0 16 16h104a8 8 0 0 0 1.94-.24l64-16a7 7 0 0 0 1.19-.4L226 182.82l.44-.2a24.6 24.6 0 0 0 3.93-41.56ZM119.46 48a31.15 31.15 0 0 1 29.14 19 8 8 0 0 0 14.8 0 31.15 31.15 0 0 1 29.14-19C209.59 48 224 62.65 224 80c0 19.51-15.79 41.58-45.66 63.9l-11.09 2.55A28 28 0 0 0 140 112h-39.32C92.05 100.36 88 90.12 88 80c0-17.35 14.41-32 31.46-32M16 160h24v40H16Zm203.43 8.21-38 16.18L119 200H56v-44.69l22.63-22.62A15.86 15.86 0 0 1 89.94 128H140a12 12 0 0 1 0 24h-28a8 8 0 0 0 0 16h32a8.3 8.3 0 0 0 1.79-.2l67-15.41.31-.08a8.6 8.6 0 0 1 6.3 15.9Z"/>
+    <path id="i-trophy" d="M232 64h-24V48a8 8 0 0 0-8-8H56a8 8 0 0 0-8 8v16H24A16 16 0 0 0 8 80v16a40 40 0 0 0 40 40h3.65A80.13 80.13 0 0 0 120 191.61V216H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16h-24v-24.42c31.94-3.23 58.44-25.64 68.08-55.58H208a40 40 0 0 0 40-40V80a16 16 0 0 0-16-16M48 120a24 24 0 0 1-24-24V80h24v32q0 4 .39 8Zm144-8.9c0 35.52-29 64.64-64 64.9a64 64 0 0 1-64-64V56h128ZM232 96a24 24 0 0 1-24 24h-.5a82 82 0 0 0 .5-8.9V80h24Z"/>
+    <path id="i-bell" d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216m-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"/>
+    <path id="i-camera" d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24m8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44m0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28"/>
+    <path id="i-pencil" d="m227.31 73.37-44.68-44.69a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69L227.31 96a16 16 0 0 0 0-22.63M92.69 208H48v-44.69l88-88L180.69 120ZM192 108.68 147.31 64l24-24L216 84.68Z"/>
+    <path id="i-arrow-up" d="M208.49 120.49a12 12 0 0 1-17 0L140 69v147a12 12 0 0 1-24 0V69l-51.51 51.49a12 12 0 0 1-17-17l72-72a12 12 0 0 1 17 0l72 72a12 12 0 0 1 0 17"/>
+    <path id="i-paw" d="M240 108a28 28 0 1 1-28-28 28 28 0 0 1 28 28m-168 0a28 28 0 1 0-28 28 28 28 0 0 0 28-28m20-20a28 28 0 1 0-28-28 28 28 0 0 0 28 28m72 0a28 28 0 1 0-28-28 28 28 0 0 0 28 28m23.12 60.86a35.3 35.3 0 0 1-16.87-21.14 44 44 0 0 0-84.5 0A35.25 35.25 0 0 1 69 148.82 40 40 0 0 0 88 224a39.5 39.5 0 0 0 15.52-3.13 64.1 64.1 0 0 1 48.87 0 40 40 0 0 0 34.73-72Z"/>
+    <path id="i-users" d="M117.25 157.92a60 60 0 1 0-66.5 0 95.83 95.83 0 0 0-47.22 37.71 8 8 0 1 0 13.4 8.74 80 80 0 0 1 134.14 0 8 8 0 0 0 13.4-8.74 95.83 95.83 0 0 0-47.22-37.71M40 108a44 44 0 1 1 44 44 44.05 44.05 0 0 1-44-44m210.14 98.7a8 8 0 0 1-11.07-2.33A79.83 79.83 0 0 0 172 168a8 8 0 0 1 0-16 44 44 0 1 0-16.34-84.87 8 8 0 1 1-5.94-14.85 60 60 0 0 1 55.53 105.64 95.83 95.83 0 0 1 47.22 37.71 8 8 0 0 1-2.33 11.07"/>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="CatsMe, back to top">
+      <img src="assets/luna-polaroid.png" alt="" width="36" height="38">
+      <span>CatsMe</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#koumbaroi">Koumbaroi</a>
+      <a href="#mission">Our mission</a>
+    </nav>
+    <a class="btn btn-primary ears" href="#join">Get early access</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">A neighbourhood app for stray cats</p>
+      <h1>Connect with <em>cats</em> <span class="rot"><span class="rot-i on">on <em>your<br>street.</em></span><span class="rot-i" aria-hidden="true">in <em>your<br>neighbourhood.</em></span><span class="rot-i" aria-hidden="true">in <em>your<br>city.</em></span><span class="rot-i" aria-hidden="true">on <em>your<br>island.</em></span></span></h1>
+      <p class="lede">Snap a stray and name it <svg class="heart-inline" viewBox="0 0 256 256" aria-hidden="true"><use href="#i-heart-fill"/></svg><br>If someone finds the same cat, agree on one name together!</p>
+      <div class="cta-row">
+        <a class="btn btn-primary ears" href="#join">Get early access</a>
+        <a class="btn btn-quiet" href="#how">See how it works</a>
+      </div>
+    </div>
+
+    <div class="table" aria-hidden="true">
+      <svg class="pol-a" viewBox="0 0 210 246"><g data-ink="polaroid" data-seed="21" data-cat="13"></g><text class="t-hand" x="24" y="226" font-size="26" fill="#4a4436">Mavros</text></svg>
+      <svg class="pol-b" viewBox="0 0 210 246"><g data-ink="polaroid" data-seed="34" data-cat="27"></g><text class="t-hand" x="24" y="226" font-size="26" fill="#4a4436">Pepper</text></svg>
+      <figure class="luna"><img src="assets/luna-polaroid.svg" alt="" width="785" height="829"><figcaption>Luna</figcaption></figure>
+      <p class="hand-note"><img class="luna-mini" src="assets/luna.svg" alt="" width="62" height="34">Cats me if you can</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROBLEM ================= -->
+<section class="problem" aria-labelledby="problem-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">The problem</p>
+      <h2 id="problem-title">Nobody knows how many stray cats live in Greece.</h2>
+    </div>
+    <div class="bars" role="img" aria-label="Bar chart: 323,303 strays on the official register, against an estimate of about three million">
+      <div class="bar-row">
+        <span class="bar-label">Official register</span>
+        <div class="bar-track"><div class="bar official"></div><span class="bar-num">323,303</span></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Sector estimate</span>
+        <div class="bar-track"><div class="bar estimate"></div></div>
+      </div>
+      <div class="bar-row">
+        <span></span>
+        <span class="bar-num estimate-num">~3,000,000</span>
+      </div>
+    </div>
+    <p class="problem-punch">That gap is the whole story. You can’t neuter, treat or protect animals nobody has counted - and the only people who know which cat lives on which corner are the neighbours who feed it every evening.</p>
+    <p class="src">National Companion Animal Registry, June 2025, via <a href="https://www.cnn.gr/perivallon/story/480795/pano-apo-323-303-ta-adespota-pou-exoun-katagrafei-sto-ethniko-mitroo-zoon-syntrofias">CNN Greece</a> and <a href="https://ecopress.gr/pano-apo-323-000-ta-adespota-zoa-se-oli-ti-chor/">ECOPRESS</a>. The three-million estimate covers cats and dogs and has never been officially verified.</p>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section id="how" aria-label="How it works">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+    </div>
+
+    <ol class="steps" style="list-style:none;padding:0">
+
+      <!-- 1 · SNAP - tap the shutter, drop a shot with its × -->
+      <li class="step">
+        <svg class="phone" id="s1" viewBox="0 0 300 580" role="group" aria-label="Try the camera: tap the shutter to photograph the cat, up to four times">
+          <defs>
+    <clipPath id="av-clip"><circle cx="20" cy="20" r="19"/></clipPath>
+    <symbol id="av-stick" viewBox="0 0 40 40"><g clip-path="url(#av-clip)" fill="none" stroke="#1a1810" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="14.5" r="6"/><path d="M20 20.5V41M20 26l-8 7M20 26l8 7"/></g></symbol>
+            <linearGradient id="cam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f52"/><stop offset="1" stop-color="#1c1d24"/></linearGradient>
+          </defs>
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <rect x="8" y="8" width="284" height="564" rx="31" fill="url(#cam)"/>
+          <path d="M26 34 L38 46 M38 34 L26 46" stroke="#f5f0e8" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M64 154V124H94M206 124H236V154M236 266V296H206M94 296H64V266" fill="none" stroke="#ecb72c" stroke-width="4"/>
+          <g transform="translate(82 142) scale(.531)" data-ink="cat" data-seed="5" data-color="#ffcb45" data-light="#30333f"></g>
+          <text id="s1-count" class="t-body" x="150" y="334" text-anchor="middle" font-size="12" fill="#f5f0e8">2 of 4 · another angle helps</text>
+          <g id="s1-strip"></g>
+          <g id="s1-shutter" class="tap" role="button" tabindex="0" aria-label="Take a photo">
+            <circle class="hit" cx="150" cy="490" r="46" fill="transparent"/>
+            <circle class="pulse" cx="150" cy="490" r="34" fill="none" stroke="#ecb72c" stroke-width="3"/>
+            <circle cx="150" cy="490" r="32" fill="#ecb72c" stroke="#f5f0e8" stroke-width="4"/>
+            <path d="M130.2 464.5 135.7 449.9 148.1 459.4Z M169.8 464.5 164.3 449.9 151.9 459.4Z" fill="#ecb72c"/>
+          </g>
+          <rect id="s1-flash" x="8" y="8" width="284" height="564" rx="31" fill="#fff" opacity="0" pointer-events="none"/>
+        </svg>
+        <div class="step-text">
+          <svg class="step-num" viewBox="0 0 42 42" aria-hidden="true"><path data-ink="circle" data-cx="21" data-cy="21" data-r="18" data-seed="3" fill="#ecb72c"/><text class="t-serif" x="21" y="28" text-anchor="middle" font-size="20" fill="#020107">1</text></svg>
+          <h3>Snap it</h3>
+        </div>
+      </li>
+
+      <!-- 2 · NAME - type, and the name follows the cat through every screen -->
+      <li class="step">
+        <svg class="phone" id="s2" viewBox="0 0 300 580" role="group" aria-label="Try naming the cat: type a name and it is written on the polaroid">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <text class="t-serif" x="26" y="66" font-size="22" fill="#f5f0e8">Give it a name</text>
+          <text class="t-body" x="26" y="89" font-size="12" fill="#a89e8c">It’s yours the moment you type it.</text>
+          <g id="s2-pol" transform="translate(58 112) rotate(-2 92 108) scale(.876)">
+            <g data-ink="polaroid" data-seed="7" data-cat="5"></g>
+            <text class="t-hand" data-name x="24" y="226" font-size="26" fill="#4a4436">Zaira</text>
+          </g>
+          <text class="t-label" x="28" y="364" font-size="10" fill="#a89e8c">NAME</text>
+          <foreignObject x="18" y="368" width="264" height="58">
+            <input id="s2-input" class="phone-input invite" type="text" value="Zaira" maxlength="14" autocomplete="off" spellcheck="false" aria-label="The cat’s name">
+          </foreignObject>
+          <g id="s2-keep" class="tap" role="button" tabindex="0" aria-label="Keep it">
+            <path class="hit-fill" data-ink="ears" data-x="24" data-y="456" data-w="252" data-h="48" fill="#ecb72c"/>
+            <text id="s2-keep-label" class="t-bold" x="150" y="485" text-anchor="middle" font-size="15" fill="#020107">Keep it</text>
+          </g>
+        </svg>
+        <div class="step-text">
+          <svg class="step-num" viewBox="0 0 42 42" aria-hidden="true"><path data-ink="circle" data-cx="21" data-cy="21" data-r="18" data-seed="4" fill="#ecb72c"/><text class="t-serif" x="21" y="28" text-anchor="middle" font-size="20" fill="#020107">2</text></svg>
+          <h3>Name it</h3>
+        </div>
+      </li>
+
+      <!-- 3 · SPOTTED - the eye and the heart work -->
+      <li class="step">
+        <svg class="phone" id="s3" viewBox="0 0 300 580" role="group" aria-label="Try the feed: tap the eye to say you have seen this cat too, or the heart to like it">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <text class="t-serif" x="24" y="64" font-size="26" fill="#f5f0e8">Feed</text>
+          <rect x="12" y="84" width="276" height="428" rx="20" fill="#1c1d24"/>
+          <circle cx="44" cy="118" r="17" fill="#f5f0e8"/>
+          <use href="#av-stick" x="26.1" y="100.1" width="35.8" height="35.8"/>
+          <text class="t-body" x="70" y="114" font-size="13" fill="#f5f0e8">User01</text>
+          <text class="t-body" x="70" y="131" font-size="10.5" fill="#a89e8c">named their cat “<tspan data-name>Zaira</tspan>” · 2h ago</text>
+          <g transform="translate(31 150) rotate(-1.5 115 135) scale(1.095)">
+            <g data-ink="polaroid" data-seed="7" data-cat="5"></g>
+            <text class="t-hand" data-name x="24" y="226" font-size="26" fill="#4a4436">Zaira</text>
+          </g>
+          <g id="s3-eye" class="tap" role="button" tabindex="0" aria-pressed="false" aria-label="I’ve seen this cat too" style="color:#a89e8c">
+            <rect class="hit" x="182" y="436" width="56" height="40" rx="10" fill="transparent"/>
+            <circle class="pulse" cx="201" cy="456" r="15" fill="none" stroke="#ecb72c" stroke-width="2.5"/>
+            <g transform="translate(157.4 394.5) scale(.44)" data-ink="eye" data-seed="7" data-color="currentColor"></g>
+            <text id="s3-eye-n" class="t-body" x="218" y="461" font-size="13" fill="currentColor">3</text>
+          </g>
+          <g id="s3-heart" class="tap" role="button" tabindex="0" aria-pressed="false" aria-label="Like this cat" style="color:#a89e8c">
+            <rect class="hit" x="238" y="436" width="50" height="40" rx="10" fill="transparent"/>
+            <g id="s3-heart-icon" class="springy"><use id="s3-heart-use" href="#i-heart" transform="translate(242 446) scale(.078)" fill="currentColor"/></g>
+            <text id="s3-heart-n" class="t-body" x="266" y="461" font-size="13" fill="currentColor">12</text>
+          </g>
+          <g id="s3-toast" class="fade" opacity="0">
+            <rect x="34" y="528" width="232" height="34" rx="17" fill="#1c1d24" stroke="#ecb72c" stroke-width="1.5"/>
+            <text class="t-body" x="150" y="549" text-anchor="middle" font-size="11.5" fill="#f5f0e8">You saw <tspan data-name>Zaira</tspan> too · +10 XP</text>
+          </g>
+        </svg>
+        <div class="step-text">
+          <svg class="step-num" viewBox="0 0 42 42" aria-hidden="true"><path data-ink="circle" data-cx="21" data-cy="21" data-r="18" data-seed="5" fill="#ecb72c"/><text class="t-serif" x="21" y="28" text-anchor="middle" font-size="20" fill="#020107">3</text></svg>
+          <h3>A neighbour spots it <svg class="title-eye" viewBox="74 117 50 45" aria-hidden="true"><g data-ink="eye" data-seed="7" data-color="currentColor"></g></svg></h3>
+        </div>
+      </li>
+
+      <!-- 4 · KOUMBAROI - a tied poll; your vote settles it -->
+      <li class="step">
+        <svg class="phone invite" id="s4" viewBox="0 0 300 580" role="group" aria-label="Try the naming round: the poll is tied, tap a name to cast the deciding vote">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <text class="t-serif" x="24" y="64" font-size="22" fill="#f5f0e8">One name, together</text>
+          <g id="s4-a" class="tap" role="button" tabindex="0" aria-pressed="false" aria-label="Vote for this name">
+            <rect class="card-bg" x="20" y="104" width="122" height="104" rx="16" fill="#1c1d24" stroke="#2e3040" stroke-width="2"/>
+            <circle cx="48" cy="132" r="13" fill="#f5f0e8"/>
+            <use href="#av-stick" x="34.3" y="118.3" width="27.4" height="27.4"/>
+            <text class="t-hand cand-name" data-name x="34" y="180" font-size="24" fill="#f5f0e8">Zaira</text>
+            <text class="t-body votes" x="34" y="198" font-size="10.5" fill="#a89e8c">6 votes</text>
+          </g>
+          <g id="s4-b" class="tap" role="button" tabindex="0" aria-pressed="false" aria-label="Vote for Pepper">
+            <rect class="card-bg" x="158" y="104" width="122" height="104" rx="16" fill="#1c1d24" stroke="#2e3040" stroke-width="2"/>
+            <circle cx="186" cy="132" r="13" fill="#f5f0e8"/>
+            <use href="#av-stick" x="172.3" y="118.3" width="27.4" height="27.4"/>
+            <text class="t-hand cand-name" x="172" y="180" font-size="24" fill="#f5f0e8">Pepper</text>
+            <text class="t-body votes" x="172" y="198" font-size="10.5" fill="#a89e8c">6 votes</text>
+          </g>
+          <path d="M150 216v14M141 222l9 9 9-9" fill="none" stroke="#ecb72c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="translate(64 244) rotate(2 86 101) scale(.82)">
+            <g data-ink="polaroid" data-seed="7" data-cat="5"></g>
+            <text id="s4-caption" class="t-hand" x="24" y="226" font-size="26" fill="#4a4436">?</text>
+          </g>
+          <g id="s4-crown" class="fade" opacity="0">
+            <circle cx="94" cy="390" r="17" fill="#ecb72c" stroke="#0c0d11" stroke-width="2.5"/>
+            <use href="#i-crown" transform="translate(84.6 380.6) scale(.0735)" fill="#020107"/>
+          </g>
+          <circle cx="40" cy="496" r="14" fill="#f5f0e8" stroke="#0c0d11" stroke-width="2"/>
+          <use href="#av-stick" x="25.3" y="481.3" width="29.5" height="29.5"/>
+          <circle cx="60" cy="496" r="14" fill="#f5f0e8" stroke="#0c0d11" stroke-width="2"/>
+          <use href="#av-stick" x="45.3" y="481.3" width="29.5" height="29.5"/>
+          <text id="s4-l1" class="t-bold" x="86" y="492" font-size="13" fill="#f5f0e8">It’s a tie</text>
+          <text id="s4-l2" class="t-body" x="86" y="509" font-size="10.5" fill="#a89e8c">Your vote decides - tap a name</text>
+        </svg>
+        <div class="step-text">
+          <svg class="step-num" viewBox="0 0 42 42" aria-hidden="true"><path data-ink="circle" data-cx="21" data-cy="21" data-r="18" data-seed="6" fill="#ecb72c"/><text class="t-serif" x="21" y="28" text-anchor="middle" font-size="20" fill="#020107">4</text></svg>
+          <h3>Agree on one name</h3>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= KOUMBAROI ================= -->
+<section id="koumbaroi" class="koum" aria-labelledby="koum-title">
+  <div class="wrap koum-grid">
+    <svg class="crown" viewBox="0 0 220 220" role="img" aria-label="The koumbaroi badge: a crown in a gold circle">
+      <path data-ink="circle" data-cx="110" data-cy="110" data-r="100" data-seed="12" fill="#0c0d11"/>
+      <path data-ink="circle" data-cx="110" data-cy="110" data-r="86" data-seed="19" fill="#ecb72c"/>
+      <use href="#i-crown" transform="translate(54 50) scale(.4375)" fill="#020107"/>
+    </svg>
+    <div>
+      <p class="eyebrow">Koumbaroi</p>
+      <h2 id="koum-title" style="margin-top:12px;max-width:18ch">2+ strangers, one cat, one name.</h2>
+      <p class="lede" style="margin-top:18px;max-width:54ch">At a Greek baptism, the godparent and the baby’s parents form a bond for life. In CatsMe, the people who agree on a cat’s name share that same bond.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <svg class="scene" viewBox="0 0 720 300" role="img" aria-label="Sketch: a cat sleeps in a box at the corner of a wall. One person photographs it and calls it Zaira; a second person photographs the same cat, says they have seen it and suggests Pepper. Pepper fades, the two come closer, a gold line joins them with a crown in the middle, and Zaira floats above: they are koumbaroi.">
+      <rect width="720" height="300" rx="24" fill="#0c0d11"/>
+      <path data-ink="wrect" data-x="236" data-y="92" data-w="248" data-h="156" data-j="2.4" data-seed="70" fill="#1c1d24"/>
+      <path data-ink="wrect" data-x="268" data-y="116" data-w="44" data-h="36" data-j="1.4" data-seed="71" fill="#2e3040"/>
+      <path data-ink="wrect" data-x="408" data-y="116" data-w="44" data-h="36" data-j="1.4" data-seed="72" fill="#3d2e08"/>
+      <path d="M24 248H696" stroke="#2e3040" stroke-width="3" stroke-linecap="round"/>
+      <text class="t-hand zz" x="346" y="152" font-size="16" fill="#a89e8c">z</text>
+      <text class="t-hand zz zz2" x="360" y="136" font-size="20" fill="#a89e8c">z</text>
+      <text class="t-hand zz zz3" x="378" y="116" font-size="26" fill="#a89e8c">Z</text>
+      <path data-ink="blob" data-cx="364" data-cy="202" data-rx="58" data-ry="26" data-seed="80" fill="#ffcb45"/>
+      <g transform="translate(286 152) scale(.23)" data-ink="sleepcat" data-seed="5" data-color="#ffcb45" data-dark="#0c0d11"></g>
+      <path data-ink="wrect" data-x="300" data-y="208" data-w="124" data-h="40" data-j="1.8" data-seed="81" fill="#6b5008"/>
+      <path d="M304 211H420" stroke="#8a5c04" stroke-width="3" stroke-linecap="round"/>
+      <path d="M416 206c24 4 32 20 18 32" stroke="#ffcb45" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path class="bond-arc" style="--d:5s" d="M220 144Q360 60 500 144" pathLength="100" fill="none" stroke="#ecb72c" stroke-width="3.5" stroke-linecap="round"/>
+          <g class="fig fig-a" style="--d:0s">
+            <g class="near-a" style="--d:4.7s">
+              <g transform="translate(110 248)">
+                <g fill="none" stroke="#f5f0e8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="0" cy="-108" r="17"/>
+                  <path d="M0 -91V-38M0 -38L-15 0M0 -38L15 0M0 -76L-17 -50M0 -76Q22 -80 46 -88"/>
+                </g>
+                <rect x="44" y="-104" width="18" height="30" rx="4" fill="#2e3040" stroke="#0c0d11" stroke-width="2"/>
+                <circle cx="53" cy="-96" r="3" fill="#ecb72c"/>
+                <circle class="flash" style="--d:0.35s" cx="72" cy="-98" r="17" fill="#fff"/>
+                <g class="tag-move" style="--d:5.6s">
+                  <g class="pop tag" style="--d:0.8s">
+                    <rect x="-58" y="-198" width="116" height="42" rx="21" fill="#f5f0e8"/>
+                    <path d="M-8 -157 0 -144 8 -157Z" fill="#f5f0e8"/>
+                    <text class="t-hand" x="0" y="-168" text-anchor="middle" font-size="26" fill="#1a1810">Zaira</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+          <g class="fig fig-b" style="--d:1.1s">
+            <g class="near-b" style="--d:4.7s">
+              <g transform="translate(610 248)">
+                <g fill="none" stroke="#f5f0e8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="0" cy="-108" r="17"/>
+                  <path d="M0 -91V-38M0 -38L-15 0M0 -38L15 0M0 -76L17 -50M0 -76Q-22 -80 -46 -88"/>
+                </g>
+                <rect x="-62" y="-104" width="18" height="30" rx="4" fill="#2e3040" stroke="#0c0d11" stroke-width="2"/>
+                <circle cx="-53" cy="-96" r="3" fill="#ecb72c"/>
+                <circle class="flash" style="--d:1.45s" cx="-72" cy="-98" r="17" fill="#fff"/>
+                <g class="pop eye-b" style="--d:1.45s"><g transform="translate(-108.4 -212.2) scale(.6)" data-ink="eye" data-seed="7" data-color="#ffcb45"></g></g>
+                <g class="pop tag tag-b" style="--d:1.9s">
+                    <rect x="-58" y="-198" width="116" height="42" rx="21" fill="#f5f0e8"/>
+                    <path d="M-8 -157 0 -144 8 -157Z" fill="#f5f0e8"/>
+                    <text class="t-hand" x="0" y="-168" text-anchor="middle" font-size="26" fill="#1a1810">Pepper</text>
+                  </g>
+              </g>
+            </g>
+          </g>
+      <g class="pop crown-s" style="--d:5.4s">
+        <circle cx="360" cy="102" r="20" fill="#ecb72c" stroke="#0c0d11" stroke-width="3"/>
+        <use href="#i-crown" transform="translate(348.5 90.5) scale(.0898)" fill="#020107"/>
+      </g>
+    </svg>
+    <div class="journey" role="group" aria-label="How two neighbours become koumbaroi">
+      <div class="lanes">
+        <article class="lane" style="--d:0s">
+          <header class="who"><svg class="av" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#efe6d3"/><use href="#av-stick" x="0.0" y="0.0" width="40.0" height="40.0"/></svg><span><b>User01</b><small>found the cat</small></span></header>
+          <ol class="beats">
+            <li style="--d:0.35s"><svg viewBox="0 0 256 256" aria-hidden="true"><use href="#i-camera"/></svg>Snaps a stray</li>
+            <li class="to" aria-hidden="true" style="--d:0.6s">&rarr;</li>
+            <li style="--d:0.8s"><svg viewBox="0 0 256 256" aria-hidden="true"><use href="#i-pencil"/></svg>Names it <span class="hand">Zaira</span></li>
+          </ol>
+        </article>
+        <article class="lane" style="--d:1.1s">
+          <header class="who"><svg class="av" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#efe6d3"/><use href="#av-stick" x="0.0" y="0.0" width="40.0" height="40.0"/></svg><span><b>User02</b><small>saw it too</small></span></header>
+          <ol class="beats">
+            <li style="--d:1.45s"><svg viewBox="74 117 50 45" aria-hidden="true"><g data-ink="eye" data-seed="7" data-color="currentColor"></g></svg>Says they’ve seen it</li>
+            <li class="to" aria-hidden="true" style="--d:1.7s">&rarr;</li>
+            <li style="--d:1.9s"><svg viewBox="0 0 256 256" aria-hidden="true"><use href="#i-pencil"/></svg>Suggests <span class="hand">Pepper</span></li>
+          </ol>
+        </article>
+      </div>
+      <svg class="merge merge-wide" style="--d:3.8s" viewBox="0 0 64 200" aria-hidden="true"><path d="M2 50C34 50 30 100 58 100M2 150C34 150 30 100 58 100" fill="none" stroke="#1a1810" stroke-width="3" stroke-linecap="round"/><path d="M50 92l9 8-9 8" fill="none" stroke="#1a1810" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="merge merge-tall" style="--d:3.8s" viewBox="0 0 200 52" aria-hidden="true"><path d="M50 2C50 30 100 26 100 46M150 2C150 30 100 26 100 46" fill="none" stroke="#1a1810" stroke-width="3" stroke-linecap="round"/><path d="M92 38l8 9 8-9" fill="none" stroke="#1a1810" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <article class="together" style="--d:4.2s">
+        <p class="t-lab">Together</p>
+        <div class="bond" style="--d:4.6s">
+          <svg class="pair" viewBox="0 0 112 76" aria-hidden="true">
+            <g class="pa pa-a" style="--d:4.7s"><g><circle cx="30" cy="44" r="26" fill="#f5f0e8"/><use href="#av-stick" x="2.6" y="16.6" width="54.7" height="54.7"/></g><circle cx="30" cy="44" r="26" fill="none" stroke="#0c0d11" stroke-width="3"/></g>
+            <g class="pa pa-b" style="--d:4.7s"><g><circle cx="68" cy="44" r="26" fill="#f5f0e8"/><use href="#av-stick" x="40.6" y="16.6" width="54.7" height="54.7"/></g><circle cx="68" cy="44" r="26" fill="none" stroke="#0c0d11" stroke-width="3"/></g>
+            <g class="crown-pop" style="--d:5.1s"><circle cx="94" cy="18" r="16" fill="#ecb72c" stroke="#0c0d11" stroke-width="3"/>
+            <use href="#i-crown" transform="translate(85 9) scale(.0703)" fill="#020107"/></g>
+          </svg>
+          <p><b>Koumbaroi.</b><small>The cat is called <span class="hand">Zaira</span>.</small></p>
+        </div>
+      </article>
+    </div>
+    <button class="replay" type="button" hidden><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M197.67 186.37a8 8 0 0 1 0 11.29C196.58 198.73 170.82 224 128 224c-37.39 0-64.53-22.4-80-39.85V208a8 8 0 0 1-16 0v-48a8 8 0 0 1 8-8h48a8 8 0 0 1 0 16H55.44C67.76 183.35 93 208 128 208c36 0 58.14-21.46 58.36-21.68a8 8 0 0 1 11.31.05M216 40a8 8 0 0 0-8 8v23.85C192.53 54.4 165.39 32 128 32c-42.82 0-68.58 25.27-69.66 26.34a8 8 0 0 0 11.3 11.34C69.86 69.46 92 48 128 48c35 0 60.24 24.65 72.56 40H168a8 8 0 0 0 0 16h48a8 8 0 0 0 8-8V48a8 8 0 0 0-8-8"/></svg>Play it again</button>
+  </div>
+</section>
+
+<!-- ================= MISSION ================= -->
+<section id="mission" class="mission" aria-labelledby="mission-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Our mission</p>
+      <h2 id="mission-title">Count every cat, so every cat can be cared for.</h2>
+    </div>
+    <div class="screens">
+      <div class="screen">
+        <h3>Flag a cat in trouble</h3>
+        <svg class="phone nudge" id="m1" viewBox="0 0 300 580" role="group" aria-label="Try it: clear the care flag on this cat, or tap Support this cat to see who you can give to">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <g id="m1-push" class="fade">
+            <rect x="14" y="26" width="272" height="76" rx="18" fill="#2e3040"/>
+            <rect x="26" y="40" width="30" height="30" rx="8" fill="#ecb72c"/>
+            <g transform="translate(29 43) scale(.094)" data-ink="cat" data-seed="5" data-color="#1a1810" data-light="#ecb72c" data-nowhisk="1"></g>
+            <text class="t-label" x="66" y="51" font-size="9" fill="#a89e8c">CatsMe · now</text>
+            <text class="t-bold" x="66" y="70" font-size="13" fill="#f5f0e8"><tspan data-name>Zaira</tspan> may need help</text>
+            <text class="t-body" x="66" y="88" font-size="9.6" fill="#a89e8c">Somebody flagged this cat as needing care.</text>
+          </g>
+          <g transform="translate(66 124) rotate(-2 84 98) scale(.8)">
+            <g data-ink="polaroid" data-seed="7" data-cat="5"></g>
+            <text class="t-hand" data-name x="24" y="226" font-size="26" fill="#4a4436">Zaira</text>
+          </g>
+          <g id="m1-notice" class="fade">
+            <rect x="20" y="346" width="260" height="58" rx="14" fill="#1e2e18"/>
+            <use href="#i-handheart" transform="translate(34 364) scale(.086)" fill="#a8c890"/>
+            <text class="t-body" x="64" y="372" font-size="11" fill="#a8c890">Someone has flagged this cat</text>
+            <text class="t-body" x="64" y="389" font-size="11" fill="#a8c890">as needing care.</text>
+          </g>
+          <g id="m1-cleared" class="fade" opacity="0">
+            <rect x="20" y="346" width="260" height="58" rx="14" fill="#1c1d24"/>
+            <path d="M37 375l6 6 12-13" fill="none" stroke="#a89e8c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text class="t-bold" x="64" y="372" font-size="11.5" fill="#f5f0e8">Care flag cleared</text>
+            <text class="t-body" x="64" y="389" font-size="10.5" fill="#a89e8c">Local carers no longer see it first.</text>
+          </g>
+          <g id="m1-support" class="tap" role="button" tabindex="0" aria-label="Support this cat: see who you can give to">
+            <rect class="card-bg" x="20" y="420" width="260" height="58" rx="14" fill="#1c1d24" stroke="#1c1d24" stroke-width="2"/>
+            <use href="#i-handheart" transform="translate(34 438) scale(.086)" fill="#ecb72c"/>
+            <text class="t-bold" x="64" y="446" font-size="12.5" fill="#f5f0e8">Support this cat</text>
+            <text class="t-body" x="64" y="463" font-size="10" fill="#a89e8c">Food &amp; vet care for local carers</text>
+            <path d="M262 442l7 7-7 7" fill="none" stroke="#a89e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g id="m1-flag" class="tap" role="button" tabindex="0" aria-label="Clear the care flag">
+            <rect class="card-bg lead" x="20" y="494" width="260" height="46" rx="23" fill="#0c0d11" stroke="#4a4840" stroke-width="1.5"/>
+            <text id="m1-flag-label" class="t-bold" x="150" y="522" text-anchor="middle" font-size="12.5" fill="#f5f0e8">Clear the care flag</text>
+          </g>
+        </svg>
+      </div>
+      <div class="screen">
+        <h3>Give where it’s needed</h3>
+        <svg class="phone" id="m2" viewBox="0 0 300 580" role="group" aria-label="Try the Give to the cats screen: tap Donate, or pick another organisation. CatsMe takes no cut">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <path d="M34 58l-8 8 8 8M26 66h16" fill="none" stroke="#f5f0e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <text class="t-serif" x="150" y="73" text-anchor="middle" font-size="18" fill="#f5f0e8">Give to the cats</text>
+          <path data-ink="blob" data-cx="150" data-cy="172" data-rx="72" data-ry="64" data-seed="41" fill="#ecb72c"/>
+          <image href="assets/luna-polaroid.svg" x="86" y="104" width="128" height="135" preserveAspectRatio="xMidYMid meet" aria-hidden="true"/>
+          <g id="m2-heart" class="springy"><use href="#i-heart-fill" transform="translate(198 98) scale(.11)" fill="#ffcb45"/></g>
+          <g class="floaty" opacity="0"><use href="#i-heart-fill" transform="translate(92 110) scale(.06)" fill="#ffcb45"/></g>
+          <g class="floaty" opacity="0"><use href="#i-heart-fill" transform="translate(222 156) scale(.05)" fill="#ffcb45"/></g>
+          <g class="floaty" opacity="0"><use href="#i-heart-fill" transform="translate(176 92) scale(.045)" fill="#ffcb45"/></g>
+          <text class="t-serif" x="150" y="272" text-anchor="middle" font-size="19" fill="#f5f0e8">Help the cats near you</text>
+          <text class="t-body" x="150" y="295" text-anchor="middle" font-size="11" fill="#a89e8c">Every gift goes to the people who feed</text>
+          <text class="t-body" x="150" y="311" text-anchor="middle" font-size="11" fill="#a89e8c">them and take them to the vet.</text>
+          <g id="m2-card">
+            <rect x="18" y="332" width="264" height="66" rx="16" fill="#1c1d24" stroke="#ecb72c" stroke-width="1.5"/>
+            <circle cx="50" cy="365" r="18" fill="#3d2e08"/>
+            <use href="#i-handheart" transform="translate(40.5 355.5) scale(.074)" fill="#ecb72c"/>
+            <text id="m2-name" class="t-bold" x="78" y="361" font-size="13" fill="#f5f0e8">Cat rescue group</text>
+            <text id="m2-meta" class="t-body" x="78" y="379" font-size="10" fill="#a89e8c">Food, vet care, neutering · 3 km</text>
+          </g>
+          <g id="m2-give" class="tap" role="button" tabindex="0" aria-label="Donate to Cat rescue group">
+            <path class="ring" data-ink="ears" data-x="24" data-y="424" data-w="252" data-h="48" fill="#ecb72c"/>
+            <text id="m2-give-label" class="t-bold" x="150" y="454" text-anchor="middle" font-size="15" fill="#020107">Donate</text>
+          </g>
+          <text class="t-body" x="150" y="494" text-anchor="middle" font-size="9.8" fill="#a89e8c">Opens their own page · CatsMe takes no cut</text>
+          <text class="t-label" x="20" y="522" font-size="9" fill="#a89e8c">OR GIVE TO</text>
+          <g class="tap" role="button" tabindex="0" data-chip="0" data-org="1" aria-label="Give to Animal welfare society instead">
+            <rect class="card-bg" x="18" y="530" width="128" height="32" rx="16" fill="#1c1d24" stroke="#2e3040" stroke-width="1.5"/>
+            <text class="t-body" x="82" y="550" text-anchor="middle" font-size="9.5" fill="#f5f0e8">Animal welfare society</text>
+          </g>
+          <g class="tap" role="button" tabindex="0" data-chip="1" data-org="2" aria-label="Give to Island cat rescue instead">
+            <rect class="card-bg" x="154" y="530" width="128" height="32" rx="16" fill="#1c1d24" stroke="#2e3040" stroke-width="1.5"/>
+            <text class="t-body" x="218" y="550" text-anchor="middle" font-size="9.5" fill="#f5f0e8">Island cat rescue</text>
+          </g>
+        </svg>
+      </div>
+      <div class="screen">
+        <h3>Become a tiger</h3>
+        <svg class="phone" id="m3" viewBox="0 0 300 580" role="group" aria-label="Try the Rewards screen: claim missions and achievements and watch the XP bar fill. A photo in step 1 and a settled name in step 4 unlock more">
+          <rect x="1" y="1" width="298" height="578" rx="38" fill="#0c0d11" stroke="#2e3040" stroke-width="2"/>
+          <text class="t-serif" x="22" y="64" font-size="22" fill="#f5f0e8">Rewards</text>
+          <rect x="14" y="84" width="272" height="96" rx="16" fill="#1c1d24"/>
+          <g id="m3-tier-icon" class="springy"><circle cx="50" cy="118" r="22" fill="#ecb72c"/><use href="#i-paw" transform="translate(39 107) scale(.086)" fill="#020107"/></g>
+          <text id="m3-tier" class="t-serif" x="84" y="115" font-size="16" fill="#f5f0e8">Whisker Scout</text>
+          <text id="m3-xp" class="t-body" x="84" y="133" font-size="10" fill="#a89e8c" aria-live="polite">180 XP · 120 to Alley Ranger</text>
+          <text id="m3-plus" class="t-bold" x="272" y="115" text-anchor="end" font-size="13" fill="#ecb72c" opacity="0" aria-hidden="true">+5 XP</text>
+          <g transform="translate(28 152)"><path data-ink="bar" data-w="244" data-h="12" data-seed="3" fill="#2e3040"/></g>
+          <g transform="translate(28 152)"><path id="m3-bar" data-ink="bar" data-w="98" data-h="12" data-seed="4" fill="#ecb72c"/></g>
+          <text class="t-label" x="20" y="206" font-size="9.5" fill="#a89e8c">DAILY MISSIONS</text>
+          <rect x="14" y="216" width="272" height="58" rx="14" fill="#1c1d24"/><text class="t-body" x="30" y="237" font-size="12" fill="#f5f0e8">Daily check-in</text><text class="t-body" x="180" y="237" text-anchor="end" font-size="10" fill="#ecb72c">+5 XP</text><g transform="translate(30 246)"><path data-ink="bar" data-w="150" data-h="8" data-seed="216" fill="#2e3040"/></g><g transform="translate(30 246)"><path data-ink="bar" data-w="150" data-h="8" data-seed="217" fill="#ecb72c"/></g><text class="t-body" x="30" y="267" font-size="9.5" fill="#a89e8c">1/1</text>
+          <g class="tap" role="button" tabindex="0" data-claim="5" aria-label="Claim 5 XP: daily check-in"><rect class="ring" x="200" y="231" width="72" height="28" rx="14" fill="#ecb72c"/><text class="t-bold" x="236" y="249" text-anchor="middle" font-size="11" fill="#020107">Claim</text></g>
+          <rect x="14" y="282" width="272" height="58" rx="14" fill="#1c1d24"/><text class="t-body" x="30" y="303" font-size="12" fill="#f5f0e8">Scan a cat today</text><text class="t-body" x="180" y="303" text-anchor="end" font-size="10" fill="#ecb72c">+20 XP</text><g transform="translate(30 312)"><path data-ink="bar" data-w="150" data-h="8" data-seed="282" fill="#2e3040"/></g><g transform="translate(30 312)"><path id="m3-scan-bar" class="fade" opacity="0" data-ink="bar" data-w="150" data-h="8" data-seed="283" fill="#ecb72c"/></g><text id="m3-scan-n" class="t-body" x="30" y="333" font-size="9.5" fill="#a89e8c">0/1 · take a photo in step 1</text>
+          <g id="m3-scan" class="tap" role="button" tabindex="0" aria-disabled="true" data-locked="1" data-claim="20" aria-label="Scan a cat today: take a photo in step 1 to unlock"><rect class="ring" x="200" y="297" width="72" height="28" rx="14" fill="#2e3040"/><text class="t-bold" x="236" y="315" text-anchor="middle" font-size="11" fill="#a89e8c">Claim</text></g>
+          <rect x="14" y="348" width="272" height="58" rx="14" fill="#1c1d24"/><text class="t-body" x="30" y="369" font-size="12" fill="#f5f0e8">Log a sighting</text><text class="t-body" x="180" y="369" text-anchor="end" font-size="10" fill="#ecb72c">+10 XP</text><g transform="translate(30 378)"><path data-ink="bar" data-w="150" data-h="8" data-seed="348" fill="#2e3040"/></g><g transform="translate(30 378)"><path data-ink="bar" data-w="150" data-h="8" data-seed="349" fill="#ecb72c"/></g><text class="t-body" x="30" y="399" font-size="9.5" fill="#a89e8c">1/1</text>
+          <g class="tap" role="button" tabindex="0" data-claim="10" aria-label="Claim 10 XP: log a sighting"><rect class="ring" x="200" y="363" width="72" height="28" rx="14" fill="#ecb72c"/><text class="t-bold" x="236" y="381" text-anchor="middle" font-size="11" fill="#020107">Claim</text></g>
+          <text class="t-label" x="20" y="440" font-size="9.5" fill="#a89e8c">ACHIEVEMENTS</text>
+          <rect x="14" y="452" width="82" height="88" rx="14" fill="#1c1d24"/><circle cx="55" cy="478" r="16" fill="#ecb72c"/><use href="#i-paw" transform="translate(46 469) scale(.07)" fill="#020107"/><text class="t-body" x="55" y="511" text-anchor="middle" font-size="9.5" fill="#f5f0e8">First Whiskers</text><text class="t-body" x="55" y="527" text-anchor="middle" font-size="8.5" fill="#ecb72c">Unlocked</text>
+          <g class="tap" role="button" tabindex="0" data-claim="50" aria-label="Claim 50 XP: Namegiver">
+            <rect class="card-bg" x="109" y="452" width="82" height="88" rx="14" fill="#1c1d24" stroke="#1c1d24" stroke-width="2"/>
+            <circle class="pulse" cx="150" cy="478" r="18" fill="none" stroke="#ecb72c" stroke-width="2.5"/>
+            <circle cx="150" cy="478" r="16" fill="#ecb72c"/><use href="#i-paw" transform="translate(141 469) scale(.07)" fill="#020107"/><text class="t-body" x="150" y="511" text-anchor="middle" font-size="9.5" fill="#f5f0e8">Namegiver</text><text class="t-body st" x="150" y="527" text-anchor="middle" font-size="8.5" fill="#ecb72c">Tap: +50 XP</text>
+          </g>
+          <g id="m3-koum" class="tap" role="button" tabindex="0" aria-disabled="true" data-claim="50" aria-label="Koumbaros: settle a name in step 4 to unlock">
+            <rect class="card-bg" x="204" y="452" width="82" height="88" rx="14" fill="#1c1d24" stroke="#1c1d24" stroke-width="2"/>
+            <circle class="pulse" cx="245" cy="478" r="18" fill="none" stroke="#ecb72c" stroke-width="2.5" display="none"/>
+            <circle id="m3-koum-c" cx="245" cy="478" r="16" fill="#2e3040"/><use id="m3-koum-i" href="#i-paw" transform="translate(236 469) scale(.07)" fill="#4a4840"/><text class="t-body" x="245" y="511" text-anchor="middle" font-size="9.5" fill="#f5f0e8">Koumbaros</text><text class="t-body st" x="245" y="527" text-anchor="middle" font-size="8.5" fill="#a89e8c">0 of 1</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <h3 class="m-sub">Where we’re going</h3>
+    <ol class="timeline" aria-label="Where we're going">
+        <li class="tl-item"><span class="tl-dot" aria-hidden="true"><svg viewBox="0 0 256 256"><use href="#i-paw"/></svg></span><div><h3>Goal 1: Every cat has a name</h3><p>Each stray gets its own page, so neighbours can find it and keep track of it.</p></div></li>
+        <li class="tl-item"><span class="tl-dot" aria-hidden="true"><svg viewBox="0 0 256 256"><use href="#i-users"/></svg></span><div><h3>Goal 2: Neighbours work together</h3><p>Everyone feeding the same cat is connected, so care is shared instead of repeated.</p></div></li>
+        <li class="tl-item"><span class="tl-dot" aria-hidden="true"><svg viewBox="0 0 256 256"><use href="#i-handheart"/></svg></span><div><h3>Goal 3: Help reaches cats in time</h3><p>Find a charity near you in the app and give on their own page. We take no cut.</p></div></li>
+      </ol>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section id="join" class="final" aria-labelledby="join-title">
+  <div class="wrap">
+    <svg class="mascot" viewBox="0 0 256 256" aria-hidden="true"><g data-ink="cat" data-seed="5" data-color="#ecb72c" data-light="var-bg"></g></svg>
+    <h2 id="join-title">Know a cat on your street?</h2>
+    <a class="btn btn-primary ears" href="mailto:hello@catchcats.me?subject=CatsMe%20%E2%80%94%20early%20access">Get early access</a>
+    <p class="sign">Every street cat deserves a name.</p>
+  </div>
+</section>
+
+</main>
+
+<a class="to-top" href="#top" aria-label="Back to top"><svg viewBox="-2 -2 56 64" aria-hidden="true"><g class="rim" fill="#0c0d11" stroke="#0c0d11" stroke-width="4" stroke-linejoin="round"><circle cx="26" cy="34" r="26"/><path d="M3 27 5 1 24 9ZM49 27 47 1 28 9Z"/></g><g class="head"><circle cx="26" cy="34" r="26"/><path d="M3 27 5 1 24 9ZM49 27 47 1 28 9Z"/></g><use href="#i-arrow-up" transform="translate(15 23) scale(.0859)" fill="currentColor"/></svg></a>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#top"><img src="assets/luna-polaroid.png" alt="" width="28" height="30"><span>CatsMe</span></a>
+    <span>catchcats.me · Made in Greece</span>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   The app's own hand-drawn geometry, ported verbatim from
+   src/illustrations/wobble.ts, src/components/InkCat.tsx, CatEye.tsx,
+   Polaroid.tsx and CatEarShape.tsx. Same seed, same shape as on the phone.
+   ===================================================================== */
+(function(){
+  function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+  function smooth(p){var d='M'+p[0][0].toFixed(1)+' '+p[0][1].toFixed(1);for(var i=1;i<=p.length;i++){var a=p[i%p.length],b=p[(i+1)%p.length];d+=' Q'+a[0].toFixed(1)+' '+a[1].toFixed(1)+' '+((a[0]+b[0])/2).toFixed(1)+' '+((a[1]+b[1])/2).toFixed(1);}return d+' Z';}
+  function jitter(p,j,s){var r=mulberry32(s);return p.map(function(q){return[q[0]+(r()*2-1)*j,q[1]+(r()*2-1)*j];});}
+  function wobble(p,j,s){return smooth(jitter(p,j,s));}
+  function wobbleBar(w,h,jit,seed){var r=h/2,pts=[],n=Math.max(3,Math.round(w/16)),i,a;for(i=0;i<=n;i++)pts.push([r+(w-2*r)*(i/n),0]);for(a=-90;a<=90;a+=30)pts.push([w-r+r*Math.cos(a*Math.PI/180),r+r*Math.sin(a*Math.PI/180)]);for(i=n;i>=0;i--)pts.push([r+(w-2*r)*(i/n),h]);for(a=90;a<=270;a+=30)pts.push([r+r*Math.cos(a*Math.PI/180),r+r*Math.sin(a*Math.PI/180)]);return smooth(jitter(pts,jit,seed));}
+  function wobbleCircle(cx,cy,r,j,s){var pts=[],n=Math.max(10,Math.round(r/3));for(var i=0;i<n;i++){var a=i/n*Math.PI*2;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}return smooth(jitter(pts,j,s));}
+  function wobbleRect(x,y,w,h,jit,seed,per){per=per||14;var rnd=mulberry32(seed),pts=[],edges=[[x,y,x+w,y],[x+w,y,x+w,y+h],[x+w,y+h,x,y+h],[x,y+h,x,y]],longest=Math.max(w,h)||1;
+    edges.forEach(function(e){var len=Math.hypot(e[2]-e[0],e[3]-e[1]),n=Math.max(5,Math.round(len/longest*per));for(var i=0;i<n;i++){var t=i/n;pts.push([e[0]+(e[2]-e[0])*t+(rnd()*2-1)*jit,e[1]+(e[3]-e[1])*t+(rnd()*2-1)*jit]);}});return smooth(pts);}
+
+  function tip(x,y){return[[x,y],[x,y],[x,y]];}
+  var HEAD=[[50,142],[46,118],[50,94],[55,70]].concat(tip(57,50),[[78,66],[98,79],[113,88],[128,83],[143,88],[162,77],[181,63]],tip(197,46),[[201,70],[205,97],[209,124],[212,150],[205,177],[187,195],[165,209],[139,215],[115,215],[89,208],[65,194],[52,173]]);
+  var EYE_L=[[80,140],[90,126],[104,124],[117,133],[118,144],[106,155],[90,154]];
+  var EYE_R=[[139,141],[148,127],[163,125],[177,134],[178,145],[165,156],[149,154]];
+  var NOSE=[[118,165],[138,166],[128,178]];
+  var PUP_L='M97 127 C102 133 102 148 97 154 C92 148 92 133 97 127 Z';
+  var PUP_R='M159 128 C164 134 164 149 159 155 C154 149 154 134 159 128 Z';
+  var MOUTH='M128 178 C127 188 118 190 111 185 M128 178 C129 188 138 190 145 185';
+  var WHISK='M48 150 L86 158 M47 168 L86 168 M208 152 L170 158 M209 169 L171 168';
+  var EYE=[[80,140],[90,126],[104,124],[117,133],[118,144],[106,155],[90,154]];
+  var PUPIL='M99 127 C104 133 104 148 99 154 C94 148 94 133 99 127 Z';
+
+  function p(d,attrs){return '<path d="'+d+'" '+attrs+'/>';}
+  function inkCat(seed,color,light,whiskers){
+    var s=+seed;
+    return p(wobble(HEAD,3,s),'fill="'+color+'"')+p(wobble(EYE_L,1.5,s+11),'fill="'+light+'"')+p(wobble(EYE_R,1.5,s+29),'fill="'+light+'"')+
+      p(PUP_L,'fill="'+color+'"')+p(PUP_R,'fill="'+color+'"')+p(wobble(NOSE,1.2,s+41),'fill="'+light+'"')+
+      p(MOUTH,'fill="none" stroke="'+light+'" stroke-width="5" stroke-linecap="round"')+
+      (whiskers?p(WHISK,'fill="none" stroke="'+light+'" stroke-width="5" stroke-linecap="round"'):'');
+  }
+  /* Polaroid.tsx: 210x246 frame, square window at 18,18 size 174, jitter 3.5. Paper and edge are fixed so it reads the same in both themes. */
+  function polaroid(seed,cat){
+    var s=+seed, win='#2e3040';
+    var out=p(wobbleRect(5,5,200,236,3.5,s,16),'fill="#f5f0e8" stroke="rgba(26,24,16,.18)" stroke-width="1.5"')+p(wobbleRect(18,18,174,174,3.5,s+5,14),'fill="'+win+'"');
+    if(cat) out+='<g transform="translate(22 24) scale(.65)">'+inkCat(cat,'#ffcb45',win,true)+'</g>';
+    return out;
+  }
+  function earPill(x,y,w,h){var e=11,r=h/2,base=28,lean=.32,l=Math.max(r,w*.2-base/2),rt=Math.min(w-r-base,w*.8-base/2);
+    return ['M',x+r,y,'H',x+l,'L',x+l+base*lean,y-e,'L',x+l+base,y,'H',x+rt,'L',x+rt+base*(1-lean),y-e,'L',x+rt+base,y,'H',x+w-r,'A',r,r,0,0,1,x+w-r,y+h,'H',x+r,'A',r,r,0,0,1,x+r,y,'Z'].join(' ');}
+
+  var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg-default').trim()||'#0c0d11';
+  document.querySelectorAll('[data-ink]').forEach(function(el){
+    var k=el.getAttribute('data-ink'),d=el.dataset;
+    if(k==='cat'){var light=d.light==='var-bg'?bg:d.light;el.innerHTML=inkCat(d.seed,d.color,light,!d.nowhisk);}
+    else if(k==='polaroid'){el.innerHTML=polaroid(d.seed,d.cat);}
+    else if(k==='eye'){el.innerHTML=p(wobble(EYE,1.2,+d.seed),'fill="none" stroke="'+d.color+'" stroke-width="5" stroke-linejoin="round"')+p(PUPIL,'fill="'+d.color+'"');}
+    else if(k==='circle'){el.setAttribute('d',wobbleCircle(+d.cx,+d.cy,+d.r,Math.max(.8,+d.r/22),+d.seed));}
+    else if(k==='ears'){el.setAttribute('d',earPill(+d.x,+d.y,+d.w,+d.h));}
+    else if(k==='bar'){el.setAttribute('d',wobbleBar(+d.w,+d.h,1.2,+d.seed));}
+    else if(k==='wrect'){el.setAttribute('d',wobbleRect(+d.x,+d.y,+d.w,+d.h,+(d.j||2),+d.seed,14));}
+    else if(k==='blob'){var bp=[],bn=14;for(var bi=0;bi<bn;bi++){var ba=bi/bn*Math.PI*2;bp.push([+d.cx+(+d.rx)*Math.cos(ba),+d.cy+(+d.ry)*Math.sin(ba)]);}el.setAttribute('d',wobble(bp,2.2,+d.seed));}
+    else if(k==='sleepcat'){var dk=d.dark||'#0c0d11';el.innerHTML=p(wobble(HEAD,3,+d.seed),'fill="'+d.color+'"')+
+      p('M84 142 Q100 154 116 142 M142 142 Q158 154 174 142','fill="none" stroke="'+dk+'" stroke-width="7" stroke-linecap="round"')+
+      p(wobble(NOSE,1.2,+d.seed+41),'fill="'+dk+'"')+p(WHISK,'fill="none" stroke="'+dk+'" stroke-width="5" stroke-linecap="round"');}
+  });
+  window.__ink={inkCat:inkCat,bar:function(w,h,seed){return wobbleBar(w,h,1.2,seed);}};
+  /* The mascot's knock-outs follow the page ground, so re-ink it if the system theme flips. */
+  var mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
+  if(mq&&mq.addEventListener){mq.addEventListener('change',function(){bg=getComputedStyle(document.documentElement).getPropertyValue('--bg-default').trim();document.querySelectorAll('[data-light="var-bg"]').forEach(function(el){el.innerHTML=inkCat(el.dataset.seed,el.dataset.color,bg,true);});});}
+})();
+</script>
+<script>
+/* =====================================================================
+   The four screens, working. Small on purpose: each one does the single
+   thing the app does on that screen, and the name you type in step 2
+   follows the cat through steps 3 and 4.
+   ===================================================================== */
+(function(){
+  var $=function(q){return document.querySelector(q);};
+  var ink=window.__ink; if(!ink) return;
+
+  /* Any [role=button] inside a screen answers Enter and Space like a click. */
+  document.addEventListener('keydown',function(e){
+    var t=e.target; if(!(t instanceof Element)||!t.matches('.phone [role="button"]')) return;
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();t.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
+  });
+  function settle(id){var el=$(id); if(el) el.classList.add('done');}
+  function bounce(el){el.classList.remove('pop');void el.getBBox();el.classList.add('pop');}
+
+  /* ---------- 1 · SNAP ---------- */
+  var POOL=[5,9,14,22], shots=[5,9];
+  var count=$('#s1-count'), strip=$('#s1-strip'), shutter=$('#s1-shutter'), flash=$('#s1-flash');
+  function renderStrip(){
+    var h='';
+    for(var i=0;i<4;i++){
+      var x=46+i*54, y=356;
+      if(i<shots.length){
+        h+='<rect x="'+x+'" y="'+y+'" width="46" height="46" rx="10" fill="#2e3040"/>'+
+           '<g transform="translate('+(x+3)+' '+(y+3)+') scale(.156)">'+ink.inkCat(shots[i],'#ffcb45','#2e3040',false)+'</g>'+
+           '<g class="tap" role="button" tabindex="0" aria-label="Remove photo '+(i+1)+'" data-drop="'+i+'">'+
+             '<circle class="hit" cx="'+(x+38)+'" cy="'+(y+8)+'" r="12" fill="transparent"/>'+
+             '<circle cx="'+(x+38)+'" cy="'+(y+8)+'" r="6.5" fill="rgba(0,0,0,.65)"/>'+
+             '<path d="M'+(x+35.5)+' '+(y+5.5)+'l5 5m0-5-5 5" stroke="#f5f0e8" stroke-width="1.4" stroke-linecap="round"/></g>';
+      } else {
+        h+='<rect x="'+x+'" y="'+y+'" width="46" height="46" rx="10" fill="none" stroke="#3d434f" stroke-width="1.5" stroke-dasharray="4 3"/>';
+      }
+    }
+    strip.innerHTML=h;
+    var n=shots.length;
+    count.textContent = n===0 ? 'Point your camera at a cat' : n===4 ? '4 of 4 · that’s plenty' : n+' of 4 · another angle helps';
+    var full=n>=4;
+    shutter.style.opacity = full ? .5 : 1;
+    shutter.setAttribute('aria-disabled', full ? 'true' : 'false');
+  }
+  shutter.addEventListener('click',function(){
+    if(shots.length>=4) return;
+    settle('#s1');
+    var next=POOL.filter(function(sd){return shots.indexOf(sd)<0;})[0];
+    shots.push(next);
+    document.dispatchEvent(new CustomEvent('cm:snap'));
+    flash.animate ? flash.animate([{opacity:.75},{opacity:0}],{duration:280,easing:'ease-out'}) : 0;
+    renderStrip();
+  });
+  $('#s1').addEventListener('click',function(e){
+    var d=e.target.closest('[data-drop]'); if(!d) return;
+    settle('#s1');
+    shots.splice(+d.getAttribute('data-drop'),1);
+    renderStrip();
+  });
+  renderStrip();
+
+  /* ---------- 2 · NAME ---------- */
+  var input=$('#s2-input'), keepLabel=$('#s2-keep-label'), keepTimer;
+  function currentName(){ var v=(input.value||'').trim(); return v||'…'; }
+  function spreadName(){
+    var n=currentName();
+    document.querySelectorAll('[data-name]').forEach(function(el){el.textContent=n;});
+    var a=$('#s4-a'); if(a) a.setAttribute('aria-label','Vote for '+n);
+    renderVote();
+  }
+  input.addEventListener('input',spreadName);
+  input.addEventListener('focus',function(){input.classList.remove('invite');});
+  $('#s2-keep').addEventListener('click',function(){
+    input.classList.remove('invite');
+    keepLabel.textContent='It’s yours!';
+    clearTimeout(keepTimer); keepTimer=setTimeout(function(){keepLabel.textContent='Keep it';},1800);
+  });
+
+  /* ---------- 3 · SPOTTED ---------- */
+  var eye=$('#s3-eye'), eyeN=$('#s3-eye-n'), toast=$('#s3-toast'), saw=false;
+  eye.addEventListener('click',function(){
+    settle('#s3'); saw=!saw;
+    eye.style.color = saw ? '#ecb72c' : '#a89e8c';
+    eyeN.textContent = saw ? '4' : '3';
+    eye.setAttribute('aria-pressed', saw);
+    toast.setAttribute('opacity', saw ? '1' : '0');
+  });
+  var heart=$('#s3-heart'), heartUse=$('#s3-heart-use'), heartN=$('#s3-heart-n'), heartIcon=$('#s3-heart-icon'), liked=false;
+  heart.addEventListener('click',function(){
+    settle('#s3'); liked=!liked;
+    heart.style.color = liked ? '#ecb72c' : '#a89e8c';
+    heartUse.setAttribute('href', liked ? '#i-heart-fill' : '#i-heart');
+    heartN.textContent = liked ? '13' : '12';
+    heart.setAttribute('aria-pressed', liked);
+    if(liked) bounce(heartIcon);
+  });
+
+  /* ---------- 4 · KOUMBAROI: a 6–6 tie, and your vote settles it ---------- */
+  var BASE=6, myVote=null, s4=$('#s4');
+  var A=$('#s4-a'), B=$('#s4-b'), cap=$('#s4-caption'), crown=$('#s4-crown'), l1=$('#s4-l1'), l2=$('#s4-l2');
+  function paintCard(card, votes, state){ /* state: 'win' | 'lose' | 'tie' */
+    card.querySelector('.card-bg').setAttribute('stroke', state==='win' ? '#ecb72c' : '#2e3040');
+    card.querySelector('.votes').textContent = votes+' votes';
+    card.querySelector('.votes').setAttribute('fill', state==='win' ? '#ecb72c' : '#a89e8c');
+    card.querySelector('.cand-name').setAttribute('fill', state==='lose' ? '#a89e8c' : '#f5f0e8');
+  }
+  function renderVote(){
+    var nameA=currentName(), nameB='Pepper';
+    var va=BASE+(myVote==='a'?1:0), vb=BASE+(myVote==='b'?1:0);
+    if(va===vb){
+      paintCard(A,va,'tie'); paintCard(B,vb,'tie');
+      cap.textContent='?'; crown.setAttribute('opacity','0');
+      l1.textContent='It’s a tie'; l2.textContent='Your vote decides - tap a name';
+    } else {
+      var aWins=va>vb;
+      paintCard(A,va,aWins?'win':'lose'); paintCard(B,vb,aWins?'lose':'win');
+      cap.textContent = aWins ? nameA : nameB;
+      crown.setAttribute('opacity','1');
+      l1.textContent='You’re koumbaroi now';
+      l2.textContent='“'+(aWins?nameB:nameA)+'” stays in its history';
+    }
+    A.setAttribute('aria-pressed', myVote==='a'); B.setAttribute('aria-pressed', myVote==='b');
+    document.dispatchEvent(new CustomEvent('cm:vote',{detail:{decided:va!==vb}}));
+  }
+  function vote(which){ s4.classList.remove('invite'); myVote = myVote===which ? null : which; renderVote(); }
+  A.addEventListener('click',function(){vote('a');});
+  B.addEventListener('click',function(){vote('b');});
+  renderVote();
+
+  /* ---------- OUR MISSION · the three screens from the app ---------- */
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Flag a cat in trouble: clear the flag (or flag again); Support opens the giving screen. */
+  var m1=$('#m1'), flagBtn=$('#m1-flag'), flagged=true;
+  flagBtn.addEventListener('click',function(){
+    m1.classList.remove('nudge'); flagged=!flagged;
+    $('#m1-push').setAttribute('opacity', flagged?'1':'0');
+    $('#m1-notice').setAttribute('opacity', flagged?'1':'0');
+    $('#m1-cleared').setAttribute('opacity', flagged?'0':'1');
+    var label = flagged ? 'Clear the care flag' : 'Flag as needing care';
+    $('#m1-flag-label').textContent=label; flagBtn.setAttribute('aria-label',label);
+  });
+  $('#m1-support').addEventListener('click',function(){
+    m1.classList.remove('nudge');
+    var r=m2.getBoundingClientRect();
+    if(r.top<0||r.bottom>innerHeight) m2.scrollIntoView({block:'center',behavior:still?'auto':'smooth'});
+    bounce($('#m2-heart'));
+    try{ $('#m2-give').focus({preventScroll:true}); }catch(e){}
+  });
+
+  /* Give to the cats: one cause up front and one big button; the others are a tap away. */
+  var ORGS=[
+    {name:'Cat rescue group', meta:'Food, vet care, neutering · 3 km'},
+    {name:'Animal welfare society', meta:'Feeding stations and TNR · 12 km'},
+    {name:'Island cat rescue', meta:'Neutering and food on the islands · 210 km'}
+  ];
+  var m2=$('#m2'), giveBtn=$('#m2-give'), giveLabel=$('#m2-give-label'), featured=0, giveTimer;
+  function feature(i, chip){
+    var was=featured; featured=i;
+    $('#m2-name').textContent=ORGS[i].name; $('#m2-meta').textContent=ORGS[i].meta;
+    giveBtn.setAttribute('aria-label','Donate to '+ORGS[i].name);
+    chip.setAttribute('data-org', was); chip.setAttribute('aria-label','Give to '+ORGS[was].name+' instead');
+    chip.querySelector('text').textContent=ORGS[was].name;
+    var card=$('#m2-card');
+    if(card.animate&&!still) card.animate([{opacity:.25},{opacity:1}],{duration:320,easing:'ease-out'});
+    clearTimeout(giveTimer); giveLabel.textContent='Donate';
+  }
+  m2.addEventListener('click',function(e){
+    var chip=e.target.closest('[data-chip]'); if(chip){ feature(+chip.getAttribute('data-org'), chip); return; }
+    if(!e.target.closest('#m2-give')) return;
+    giveLabel.textContent='Thank you!';
+    bounce($('#m2-heart'));
+    if(!still) m2.querySelectorAll('.floaty').forEach(function(h,i){
+      if(h.animate) h.animate([{opacity:0,transform:'translateY(8px) scale(.6)'},{opacity:1,transform:'translateY(-6px) scale(1)',offset:.3},{opacity:0,transform:'translateY(-34px) scale(1.1)'}],{duration:1300,delay:i*140,easing:'ease-out'});
+    });
+    clearTimeout(giveTimer); giveTimer=setTimeout(function(){giveLabel.textContent='Donate';},1800);
+  });
+
+  /* Rewards: claims add XP and fill the bar; a photo in step 1 and a settled name in step 4 unlock more. */
+  var TIERS=[['Whisker Scout',100],['Alley Ranger',300],['Rooftop Prowler',700]];
+  var xp=180, barW=98, bar=$('#m3-bar'), plus=$('#m3-plus'), m3=$('#m3');
+  function tierAt(x){ var i=0; for(var k=0;k<TIERS.length-1;k++) if(x>=TIERS[k][1]) i=k; return i; }
+  function widthFor(x){ var i=tierAt(x), lo=TIERS[i][1], hi=TIERS[i+1][1]; return Math.max(12, Math.round(244*(x-lo)/(hi-lo))); }
+  function drawBar(w){ bar.setAttribute('d', ink.bar(w,12,4)); }
+  function grow(from,to){
+    if(still||!window.requestAnimationFrame){ drawBar(to); return; }
+    var t0=null;
+    (function step(t){ if(t0===null) t0=t; var k=Math.min(1,(t-t0)/600), e=1-Math.pow(1-k,3);
+      drawBar(from+(to-from)*e); if(k<1) requestAnimationFrame(step); })(performance.now());
+  }
+  function addXp(n){
+    var before=tierAt(xp); xp+=n;
+    var i=tierAt(xp), next=TIERS[i+1], w=widthFor(xp);
+    $('#m3-tier').textContent=TIERS[i][0];
+    $('#m3-xp').textContent=xp+' XP · '+(next[1]-xp)+' to '+next[0];
+    grow(i!==before?12:barW, w); barW=w;
+    if(i!==before) bounce($('#m3-tier-icon'));
+    plus.textContent='+'+n+' XP';
+    if(plus.animate&&!still) plus.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none',offset:.25},{opacity:0,transform:'translateY(-10px)'}],{duration:1200,easing:'ease-out'});
+  }
+  m3.addEventListener('click',function(e){
+    var b=e.target.closest('[data-claim]'); if(!b||b.getAttribute('aria-disabled')==='true') return;
+    addXp(+b.getAttribute('data-claim'));
+    b.classList.add('claimed'); b.setAttribute('aria-disabled','true'); b.setAttribute('aria-label','Claimed');
+    var st=b.querySelector('.st');
+    if(st){ st.textContent='Unlocked'; st.setAttribute('fill','#ecb72c'); b.querySelector('.pulse').setAttribute('display','none'); }
+    else { b.querySelector('rect').setAttribute('fill','#2e3040'); var tx=b.querySelector('text'); tx.textContent='Claimed'; tx.setAttribute('fill','#a89e8c'); }
+  });
+  document.addEventListener('cm:snap',function(){
+    var s=$('#m3-scan'); if(s.getAttribute('data-locked')!=='1') return;
+    s.removeAttribute('data-locked');
+    $('#m3-scan-bar').setAttribute('opacity','1'); $('#m3-scan-n').textContent='1/1';
+    s.querySelector('rect').setAttribute('fill','#ecb72c'); s.querySelector('text').setAttribute('fill','#020107');
+    s.setAttribute('aria-disabled','false'); s.setAttribute('aria-label','Claim 20 XP: scan a cat today');
+  });
+  document.addEventListener('cm:vote',function(e){
+    var k=$('#m3-koum'); if(k.classList.contains('claimed')) return;
+    var on=!!(e.detail&&e.detail.decided), st=k.querySelector('.st');
+    $('#m3-koum-c').setAttribute('fill', on?'#ecb72c':'#2e3040');
+    $('#m3-koum-i').setAttribute('fill', on?'#020107':'#4a4840');
+    st.textContent = on ? 'Tap: +50 XP' : '0 of 1'; st.setAttribute('fill', on?'#ecb72c':'#a89e8c');
+    k.querySelector('.pulse').setAttribute('display', on?'inline':'none');
+    k.setAttribute('aria-disabled', on?'false':'true');
+    k.setAttribute('aria-label', on ? 'Claim 50 XP: Koumbaros' : 'Koumbaros: settle a name in step 4 to unlock');
+  });
+})();
+</script>
+<script>
+(function(){
+  var items=document.querySelectorAll('.rot-i'), i=0;
+  if(items.length<2||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  setInterval(function(){ items[i].classList.remove('on'); i=(i+1)%items.length; items[i].classList.add('on'); },2600);
+})();
+</script>
+<script>
+(function(){
+  var b=document.querySelector('.to-top'); if(!b) return;
+  function toggle(){ b.classList.toggle('show', window.scrollY > 700); }
+  window.addEventListener('scroll', toggle, {passive:true}); toggle();
+  b.addEventListener('click', function(e){
+    e.preventDefault();
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+    var brand=document.querySelector('.brand'); if(brand) brand.focus({preventScroll:true});
+  });
+})();
+</script>
+<script>
+(function(){
+  var j=document.querySelector('.journey'), btn=document.querySelector('.replay');
+  var both=[document.querySelector('.scene'), j].filter(Boolean);
+  if(!j) return;
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(still) return;   // show the finished diagram, no motion
+  both.forEach(function(el){ el.classList.add('anim-ready'); });
+  function play(){ both.forEach(function(el){ el.classList.remove('play'); void el.getBoundingClientRect(); el.classList.add('play'); }); }
+  /* A plain position check on scroll rather than IntersectionObserver: it fires everywhere, and a
+     diagram that never gets its .play class would stay invisible, which is worse than no animation. */
+  var played=false;
+  function check(){
+    if(played) return;
+    var r=both[0].getBoundingClientRect(), vh=window.innerHeight||document.documentElement.clientHeight;
+    /* Reached or already scrolled past (a link or a fast fling can jump over it): play either way. */
+    if(r.top < vh*0.75){
+      played=true; play(); if(btn) btn.hidden=false;
+      window.removeEventListener('scroll',check); window.removeEventListener('resize',check);
+      clearInterval(poll);
+    }
+  }
+  window.addEventListener('scroll',check,{passive:true}); window.addEventListener('resize',check);
+  /* Belt and braces: some embedded views never deliver scroll events. One rect read every half
+     second until it has played costs nothing and means the diagram can never stay hidden. */
+  var poll=setInterval(check,500);
+  check();
+  if(btn) btn.addEventListener('click', play);
+})();
+</script>
+</body>
+</html>
