@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CatsMe pitch deck</title>
+<meta name="description" content="CatsMe, a social app for street cats: neighbours name the cats on their street and care for them together, and cities get the count the law asks them to keep.">
+<meta property="og:title" content="CatsMe pitch deck">
+<meta property="og:description" content="A social app for street cats. Startup Week Patras 2026.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://catchcats.me/pitch/">
+<meta property="og:image" content="https://catchcats.me/pitch/media/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://catchcats.me/pitch/">
+<meta name="theme-color" content="#0c0d11">
+<link rel="icon" type="image/png" href="../assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Comfortaa:wght@500;700&family=Mynerve&display=swap">
+<style>
+/* The page: same tokens as the landing page, dark only. */
+:root{--s:.5;--bg:#0c0d11;--surface:#1c1d24;--line:#2e3040;--text:#f5f0e8;--muted:#a89e8c;--gold:#ecb72c;--gold-ink:#ffcb45}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.4 'Zen Maru Gothic',Verdana,sans-serif;-webkit-text-size-adjust:100%}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Each slide keeps its 1920x1080 canvas and is scaled as a whole, so nothing reflows. */
+.frame{width:calc(1920px * var(--s));height:calc(1080px * var(--s));overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.35);flex:none}
+.frame > .slide{transform:scale(var(--s));transform-origin:0 0}
+
+/* The slide subset (see the Slides format): an undeclared div or section is a flex column,
+   headings and paragraphs carry no margins, links look like the text around them. */
+.slide{position:relative;display:flex;flex-direction:column;width:1920px;height:1080px;overflow:hidden;
+  color:#1a1810;font-family:'Zen Maru Gothic',Verdana,sans-serif;font-size:32px;line-height:1.4;text-align:left;-webkit-font-smoothing:antialiased}
+.slide *{box-sizing:border-box}
+.slide :is(p,h1,h2,h3,ul,ol){margin:0}
+.slide h1{font-size:96px;line-height:1.1;font-weight:600}
+.slide h2{font-size:64px;line-height:1.15;font-weight:600}
+.slide h3{font-size:44px;line-height:1.2;font-weight:600}
+.slide div:not([style*="display"]){display:flex;flex-direction:column}
+.slide :is(img,svg,video){display:block}
+.slide a{color:inherit;text-decoration:inherit}
+.slide a:focus-visible{outline:4px solid var(--gold-ink);outline-offset:6px;border-radius:6px}
+.slide .xi{display:inline-flex;flex:none}
+
+/* Reading mode, the default (and the phone-upright layout): every slide in one column. */
+#stage{display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px 16px 40px}
+.bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  height:60px;padding:0 16px;background:rgba(12,13,17,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--surface)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font:700 19px/1 'Source Serif 4',Georgia,serif}
+.brand img{width:28px;height:30px;transform:rotate(-4deg)}
+.brand small{font:700 11px/1 Comfortaa,Verdana,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-ink);margin-left:4px}
+.nav{display:none;align-items:center;gap:14px}
+.hint{font-size:13px;color:var(--muted);white-space:nowrap}
+.count{min-width:64px;text-align:center;font:700 14px/1 Comfortaa,Verdana,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--muted)}
+button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:var(--surface);color:var(--text);cursor:pointer;transition:background-color .15s ease}
+button:hover{background:var(--line)}
+button:focus-visible,.brand:focus-visible{outline:3px solid var(--gold-ink);outline-offset:3px}
+button:disabled{opacity:.35;cursor:default}
+button svg{width:18px;height:18px;fill:currentColor}
+.progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold);transform-origin:0 50%;transform:scaleX(0);transition:transform .3s ease}
+
+/* Presenting mode (landscape screens): one slide at a time, controls underneath. */
+body.deck{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+body.deck #stage{position:relative;flex:1;min-height:0;display:block;padding:0}
+body.deck .frame{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s}
+body.deck .frame.on{opacity:1;visibility:visible;transition:opacity .35s ease}
+body.deck .bar{order:2;position:relative;border-bottom:0;border-top:1px solid var(--surface)}
+body.deck .progress{top:-1px;bottom:auto}
+body.deck .nav{display:flex}
+body.deck .hint{display:none}
+body.deck .tools{min-width:120px;display:flex;justify-content:flex-end}
+body:not(.deck) :is(.tools,.progress){display:none}
+@media (prefers-reduced-motion: reduce){body.deck .frame,body.deck .frame.on,.progress,button{transition:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/" aria-label="CatsMe home"><img src="../assets/luna-polaroid.png" alt="" width="28" height="30">CatsMe<small>Pitch</small></a>
+  <span class="hint">Turn sideways to present</span>
+  <nav class="nav" aria-label="Slides">
+    <button id="prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M168.49 199.51a12 12 0 0 1-17 17l-80-80a12 12 0 0 1 0-17l80-80a12 12 0 0 1 17 17L97 128Z"/></svg></button>
+    <span class="count" id="count">1 / 12</span>
+    <button id="next" type="button" aria-label="Next slide"><svg viewBox="0 0 256 256" aria-hidden="true"><path d="m184.49 136.49-80 80a12 12 0 0 1-17-17L159 128 87.51 56.49a12 12 0 1 1 17-17l80 80a12 12 0 0 1-.02 17"/></svg></button>
+  </nav>
+  <div class="tools"><button id="fs" type="button" aria-label="Full screen" aria-pressed="false"><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M220 48v40a12 12 0 0 1-24 0V60h-28a12 12 0 0 1 0-24h40a12 12 0 0 1 12 12M88 196H60v-28a12 12 0 0 0-24 0v40a12 12 0 0 0 12 12h40a12 12 0 0 0 0-24m120-40a12 12 0 0 0-12 12v28h-28a12 12 0 0 0 0 24h40a12 12 0 0 0 12-12v-40a12 12 0 0 0-12-12M88 36H48a12 12 0 0 0-12 12v40a12 12 0 0 0 24 0V60h28a12 12 0 0 0 0-24"/></svg></button></div>
+  <span class="progress" id="progress"></span>
+</header>
+<main id="stage" aria-label="CatsMe pitch deck">
+<div class="frame" role="group" aria-roledescription="slide" aria-label="1 of 12" data-title="CatsMe">
+<section class="slide" id="cover" data-transition="fade" style="display:grid; gap:64px; align-items:center; grid-template-columns:1fr 780px; padding:128px; background:#0c0d11">
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:26px; font-weight:700; letter-spacing:6px; color:#ffcb45">A SOCIAL MEDIA APP FOR STREET CATS</p>
+    <div style="display:flex; flex-direction:row; gap:32px; align-items:center">
+      <img src="media/luna-polaroid.png" alt="The CatsMe logo: Luna in a polaroid" style="width:136px; height:144px; object-fit:contain; transform:rotate(-4deg)">
+      <h1 style="font-family:'Source Serif 4', Georgia, serif; font-size:168px; font-weight:700; line-height:1; color:#f5f0e8">Cats<span style="color:#ffcb45">Me</span></h1>
+    </div>
+    <div style="display:flex; flex-direction:column">
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:44px; line-height:1.35; color:#f5f0e8">Bond with strays in your city</p>
+      <div style="display:flex; flex-direction:row; gap:14px; align-items:center">
+        <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:44px; line-height:1.35; color:#f5f0e8">and improve their lives</p>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-label="A gold heart" style="width:42px; height:42px; flex:0 0 auto"><path fill="#ecb72c" d="M240 102c0 70-103.79 126.66-108.21 129a8 8 0 0 1-7.58 0C119.79 228.66 16 172 16 102a62.07 62.07 0 0 1 62-62c20.65 0 38.73 8.88 50 23.89C139.27 48.88 157.35 40 178 40a62.07 62.07 0 0 1 62 62"/></svg>
+      </div>
+    </div>
+  </div>
+  <img src="media/cover-polaroids.png" alt="Three polaroids of drawn cats — Luna in front, Mavros and Pepper behind — and the handwritten line Cats me if you can" style="width:780px; height:696px; object-fit:contain">
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="2 of 12" data-title="Nobody knows how many street cats live in Greece">
+<section class="slide" id="problem" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px 128px 160px; background:#f5f0e8">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#8a5c04">THE PROBLEM</p>
+    <h2 style="width:1500px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">Nobody knows how many street cats live in Greece</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:28px">
+    <div style="display:flex; flex-direction:row; gap:32px; align-items:center">
+      <p style="width:400px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; color:#6e6656">OFFICIAL REGISTER</p>
+      <div style="width:124px; height:64px; display:flex; flex-direction:column; background:#ecb72c; border-radius:256px">
+      </div>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:60px; font-weight:700; color:#1a1810">323,303</p>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:32px; align-items:center">
+      <p style="width:400px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; color:#6e6656">INDUSTRY ESTIMATE</p>
+      <div style="width:1168px; height:64px; display:flex; flex-direction:column; background:repeating-linear-gradient(135deg, #ecb72c 0, #ecb72c 16px, #f9f0d0 16px, #f9f0d0 32px); border:2px solid #ecb72c; border-radius:256px">
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:32px; align-items:center">
+      <p style="width:400px; font-family:'Zen Maru Gothic', Verdana, sans-serif; color:#1a1810"></p>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:60px; font-weight:700; color:#1a1810">~3,000,000</p>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px; align-items:center; padding:36px 40px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+    <div style="width:72px; height:72px; display:flex; flex-direction:row; align-items:center; justify-content:center; flex:0 0 auto; background:#f9f0d0; border-radius:20px">
+      <span class="xi" style="width:39px; height:39px; color:#8a5c04"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg></span>
+    </div>
+    <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:34px; line-height:1.38; color:#1a1810">By law, every Greek municipality must register and sterilise its strays. You can't plan that for animals nobody has counted. Seems impossible, right?</p>
+  </div>
+  <div style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+  <p style="position:absolute; right:128px; bottom:64px; width:1240px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:24px; text-align:right; color:#6e6656"><a href="https://www.cnn.gr/perivallon/story/480795/pano-apo-323-303-ta-adespota-pou-exoun-katagrafei-sto-ethniko-mitroo-zoon-syntrofias"><u>Hellenic Pet Registry, June 2025</u></a> · <a href="https://www.ethnos.gr/greece/article/254289/anoixthplhghtaadespotasthnelladatoylaxiston3ekatommyriazoastoysdromoystopagioaithmatonsomateionkaiosaisxyoynshmera"><u>industry estimate</u></a> for cats and dogs, not officially verified · <a href="https://www.e-nomothesia.gr/kat-zoa/nomos-4830-2021-phek-169a-18-9-2021.html"><u>Law 4830/2021</u></a></p>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="3 of 12" data-title="Three taps, and a street cat exists">
+<section class="slide" id="solution" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px 128px 160px; background:#0c0d11">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#ffcb45"><span style="color:#ecb72c">OUR SOLUTION: CATSME</span></p>
+    <h2 style="font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#f5f0e8">Three taps, and a street cat exists</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px; align-items:center">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; flex:1">
+      <img src="media/screen-camera.png" alt="The app camera: a cat in the frame, two of four shots taken" style="width:296px; height:540px; flex:0 0 auto; object-fit:contain">
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <div style="width:64px; height:64px; display:flex; flex-direction:row; align-items:center; justify-content:center; background:#ecb72c; border-radius:256px">
+          <p style="font-family:'Source Serif 4', Georgia, serif; font-size:34px; font-weight:700; color:#020107">1</p>
+        </div>
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:34px; font-weight:700; line-height:1.2; color:#f5f0e8">Snap it<br></h3>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; flex:1">
+      <img src="media/screen-name.png" alt="Naming: the cat’s polaroid with the name Zaira" style="width:296px; height:540px; flex:0 0 auto; object-fit:contain">
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <div style="width:64px; height:64px; display:flex; flex-direction:row; align-items:center; justify-content:center; background:#ecb72c; border-radius:256px">
+          <p style="font-family:'Source Serif 4', Georgia, serif; font-size:34px; font-weight:700; color:#020107">2</p>
+        </div>
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:34px; font-weight:700; line-height:1.2; color:#f5f0e8">Name it<br></h3>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; flex:1">
+      <img src="media/screen-feed.png" alt="The feed: a neighbour taps “I’ve seen this cat too” on Zaira and earns +10 XP" style="width:296px; height:540px; flex:0 0 auto; object-fit:contain">
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <div style="width:64px; height:64px; display:flex; flex-direction:row; align-items:center; justify-content:center; background:#ecb72c; border-radius:256px">
+          <p style="font-family:'Source Serif 4', Georgia, serif; font-size:34px; font-weight:700; color:#020107">3</p>
+        </div>
+        <h3 style="width:255px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:34px; font-weight:700; line-height:1.2; color:#f5f0e8">A neighbour might spot it too</h3>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#f5f0e8">CatsMe</p>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="4 of 12" data-title="User loop">
+<section class="slide" id="social" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px 128px 160px; background:#f5f0e8">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#8a5c04">SOCIAL &amp; GAMES</p>
+    <h2 style="width:1600px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">User loop</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:40px; align-items:center">
+    <div style="display:flex; flex-direction:row; gap:16px; flex:0 0 auto">
+      <img src="media/screen-care-alert.png" alt="A care alert in the app: Zaira may need help; somebody flagged this cat as needing care" style="width:250px; height:457px; flex:0 0 auto; object-fit:contain">
+      <img src="media/screen-vote.png" alt="The naming vote after a neighbour taps Zaira: Zaira wins 7 to 6, a crown appears and the screen says You’re koumbaroi now" style="width:250px; height:457px; flex:0 0 auto; object-fit:contain">
+      <img src="media/screen-rewards.png" alt="The Rewards screen: Whisker Scout with 180 XP, daily missions and achievements" style="width:250px; height:457px; flex:0 0 auto; object-fit:contain">
+    </div>
+    <div style="display:flex; flex-direction:row; gap:28px; flex:1">
+      <div style="display:flex; flex-direction:column; gap:26px; flex:1; padding:36px 40px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+        <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">SOCIAL</p>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">See the cats near you</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">A feed of every cat your neighbours have spotted.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Ask for help</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">Flag a cat in trouble and its neighbours get an alert.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Share a cat</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">Agree on its name with a neighbour, then care for it together.</p>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:26px; flex:1; padding:36px 40px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+        <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">GAME</p>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Duolingo for street cats</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">Streaks and XP for spotting and naming cats.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Ranks</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">Start by being a small kitten and climb to the tiger tier.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Badges &amp; leaderboards</h3>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656">Godparent, Koumbaros and more; compete with other neighbourhoods too!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="5 of 12" data-title="Agree on a name with your neighbour and take care of the cat">
+<section class="slide" id="koumbaroi" data-transition="fade" style="background:#ecb72c">
+  <div id="e1-jjah5y" style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+  <div id="p09263ab95a57r0-b0c26119" style="position:absolute; top:128px; left:128px; width:1664px; height:232px; display:flex; flex-direction:row; gap:48px; align-items:center">
+    <img src="media/koumbaroi-badge.png" alt="The koumbaroi badge: a crown in a gold circle" style="width:172px; height:173px; object-fit:contain">
+    <div style="display:flex; flex-direction:column; gap:16px">
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#6b5008">THE HOOK · CO-GODPARENTS</p>
+      <h2 style="width:1426px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">Agree on a name with your neighbour and take care of the cat</h2>
+    </div>
+  </div>
+  <video src="media/koumbaroi.mp4" poster="media/koumbaroi-still.png" muted loop playsinline preload="metadata" aria-label="Animated sketch: one neighbour photographs a cat sleeping in a box and names it Zaira; a second neighbour photographs the same cat and suggests Pepper; Pepper fades, the two come closer, a gold arc with a crown joins them and Zaira floats above" style="position:absolute; top:459px; left:128px; width:1060px; height:461px; object-fit:contain"></video>
+  <p id="p5248089ffffac1-7199a991" style="position:absolute; top:459px; left:1244px; width:548px; height:461.5px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; line-height:1.4; color:#3d2f06">At a Greek baptism, the godparent and the baby’s parents form a bond for life. In CatsMe, the people who agree on a cat’s name share that same bond.</p>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="6 of 12" data-title="Cities must manage street cats by law.">
+<section class="slide" id="market" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px 128px 160px; background:#f5f0e8">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#8a5c04">MARKET</p>
+    <h2 style="width:1600px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">Cities must manage street cats by law.&nbsp;</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; padding:32px 36px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">GREECE</p>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:700; line-height:1; color:#1a1810">332</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; color:#1a1810">municipalities</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656"><a href="https://www.e-nomothesia.gr/kat-zoa/nomos-4830-2021-phek-169a-18-9-2021.html"><u>Law 4830/2021</u></a>: a yearly programme to register, sterilise and rehome strays.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; padding:32px 36px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">ITALY</p>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:700; line-height:1; color:#1a1810">7,894</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; color:#1a1810">comuni</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1991-08-14;281"><u>Law 281/1991</u></a>: free-living cat colonies are protected and sterilised by local authorities.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; padding:32px 36px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">SPAIN</p>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:700; line-height:1; color:#1a1810">8,132</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; color:#1a1810">municipalities</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656"><a href="https://www.boe.es/buscar/act.php?id=BOE-A-2023-7936"><u>Law 7/2023, art. 39</u></a>: every council runs a feline-colony programme; trap-neuter-return is mandatory.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; padding:32px 36px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">TURKEY</p>
+      <p style="font-family:'Source Serif 4', Georgia, serif; font-size:64px; font-weight:700; line-height:1; color:#1a1810">~1,400</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; color:#1a1810">municipalities</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#6e6656"><a href="https://www.mevzuat.gov.tr/mevzuatmetin/1.5.5199.pdf"><u>Law 5199</u></a>, amended 2024: until 2028, 0.3–0.5% of every council’s revenue is ring-fenced for strays.</p>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:40px; align-items:center; padding:36px 48px; background:#0c0d11; border-radius:28px">
+    <p style="flex:0 0 auto; font-family:'Source Serif 4', Georgia, serif; font-size:76px; font-weight:700; line-height:1; color:#ffcb45">17,700+</p>
+    <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; line-height:1.4; color:#f5f0e8">local authorities must manage street cats by law.&nbsp;</p>
+  </div>
+  <div style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+  <p style="position:absolute; right:128px; bottom:64px; width:1240px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:24px; text-align:right; color:#6e6656">Municipality counts: <a href="https://en.wikipedia.org/wiki/Administrative_divisions_of_Greece"><u>Greece, 2019 reform</u></a> · <a href="https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/"><u>ISTAT, Feb 2026</u></a> · <a href="https://ine.es/daco/daco42/codmun/cod_num_muni_provincia_ccaa.htm"><u>INE, Jan 2025</u></a> · <a href="https://en.wikipedia.org/wiki/2013_Turkish_local_government_reorganisation"><u>Turkey, 2022</u></a></p>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="7 of 12" data-title="Others organise posts. We organise the cat.">
+<section class="slide" id="competition" data-transition="fade" style="background:#f5f0e8;color:#1a1810;font-family:'Zen Maru Gothic', Verdana, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Comfortaa', Verdana, sans-serif;font-size:24px;font-weight:700;letter-spacing:6px;color:#8a5c04">COMPETITION</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:700;line-height:1.08">Others organise posts. We organise the cat.</h2>
+</div>
+
+<div style="display:flex;gap:56px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:4px;width:952px">
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:end;padding:0 16px 8px">
+<p style="font-size:24px;font-weight:700;color:#6e6656">App</p>
+<p style="font-size:24px;font-weight:700;line-height:1.25;text-align:center;color:#6e6656">Page<br>per cat</p><p style="font-size:24px;font-weight:700;line-height:1.25;text-align:center;color:#6e6656">Agreed<br>name</p><p style="font-size:24px;font-weight:700;line-height:1.25;text-align:center;color:#6e6656">Care &amp;<br>giving</p><p style="font-size:24px;font-weight:700;line-height:1.25;text-align:center;color:#6e6656">City<br>data</p>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;border-bottom:1px solid #e4ddd0;border-radius:0px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-size:28px;font-weight:700">CatchCat</p><p style="font-size:24px;color:#6e6656">Global · photo game, 2026</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;border-bottom:1px solid #e4ddd0;border-radius:0px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-size:28px;font-weight:700">Whisker Tracker</p><p style="font-size:24px;color:#6e6656">USA · colony-care app</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(90deg, #ecb72c 50%, #faf6ee 50%);border:3px solid #ecb72c"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;border-bottom:1px solid #e4ddd0;border-radius:0px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-size:28px;font-weight:700">CommunityCatz</p><p style="font-size:24px;color:#6e6656">USA · TNR map</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(90deg, #ecb72c 50%, #faf6ee 50%);border:3px solid #ecb72c"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;border-bottom:1px solid #e4ddd0;border-radius:0px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-size:28px;font-weight:700">Helpimal</p><p style="font-size:24px;color:#6e6656">Turkey · help alerts</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;border-bottom:1px solid #e4ddd0;border-radius:0px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-size:28px;font-weight:700">Facebook &amp; Nextdoor</p><p style="font-size:24px;color:#6e6656">Everywhere · groups</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(90deg, #ecb72c 50%, #faf6ee 50%);border:3px solid #ecb72c"></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:28px;height:5px;border-radius:3px;background:#c9bfae"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:360px 140px 140px 140px 140px;align-items:center;background:#f9f0d0;border:2px solid #ecb72c;border-radius:16px;padding:5px 16px">
+<div style="display:flex;flex-direction:column;gap:2px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:700;color:#8a5c04">CatsMe</p><p style="font-size:24px;color:#6e6656">Greece · Android MVP</p></div>
+<div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div><div style="display:flex;align-items:center;justify-content:center"><div style="width:40px;height:40px;border-radius:50%;background:#ecb72c;display:flex;align-items:center;justify-content:center"><span class="xi" style="width:26px;height:26px;color:#020107"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span></div></div>
+</div>
+</div>
+<div style="position:relative;flex:1;height:618px">
+<p style="position:absolute; top:0; left:0; width:656px; font-family:'Comfortaa', Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#6e6656">WHERE EACH APP SITS</p>
+<svg viewBox="0 0 656 520" aria-label="Positioning map: across, from apps that organise posts to one that organises the cat; up, from an app used by just you to one your whole street joins in. Facebook and Nextdoor, Helpimal and CatchCat sit low or left; Whisker Tracker and CommunityCatz in the middle; CatsMe alone in the top-right corner." style="position:absolute; top:50px; left:0; width:656px; height:520px"><defs><clipPath id="plot"><rect width="656" height="520" rx="24"/></clipPath></defs><rect width="656" height="520" rx="24" fill="#faf6ee"/><rect x="328" y="0" width="328" height="260" fill="#f9f0d0" clip-path="url(#plot)"/><path d="M328 20V500M20 260H636" stroke="#c9bfae" stroke-width="2" stroke-dasharray="8 8"/><rect x="1" y="1" width="654" height="518" rx="23" fill="none" stroke="#e4ddd0" stroke-width="2"/><circle cx="94" cy="218" r="13" fill="#6e6656"/><circle cx="199" cy="307" r="13" fill="#6e6656"/><circle cx="422" cy="147" r="13" fill="#6e6656"/><circle cx="492" cy="364" r="13" fill="#6e6656"/><circle cx="281" cy="449" r="13" fill="#6e6656"/><circle cx="562" cy="71" r="22" fill="#ecb72c" stroke="#1a1810" stroke-width="3"/></svg>
+<p style="position:absolute; top:250px; left:118px; width:526px; font-size:26px; font-weight:700; line-height:1.4; color:#1a1810">Facebook &amp; Nextdoor</p>
+<p style="position:absolute; top:339px; left:223px; width:421px; font-size:26px; font-weight:700; line-height:1.4; color:#1a1810">Helpimal</p>
+<p style="position:absolute; top:179px; left:20px; width:378px; font-size:26px; font-weight:700; line-height:1.4; text-align:right; color:#1a1810">CommunityCatz</p>
+<p style="position:absolute; top:396px; left:20px; width:448px; font-size:26px; font-weight:700; line-height:1.4; text-align:right; color:#1a1810">Whisker Tracker</p>
+<p style="position:absolute; top:481px; left:305px; width:339px; font-size:26px; font-weight:700; line-height:1.4; color:#1a1810">CatchCat</p>
+<p style="position:absolute; top:99px; left:20px; width:508px; font-family:'Source Serif 4', Georgia, serif; font-size:34px; font-weight:700; line-height:1.3; text-align:right; color:#8a5c04">CatsMe</p>
+<p style="position:absolute; top:66px; left:22px; width:400px; font-size:24px; font-style:italic; line-height:1.4; color:#6e6656">↑ Your whole street joins in</p>
+<p style="position:absolute; top:520px; left:22px; width:240px; font-size:24px; font-style:italic; line-height:1.4; color:#6e6656">↓ Just you</p>
+<p style="position:absolute; top:582px; left:0; width:320px; font-size:24px; font-style:italic; line-height:1.4; color:#6e6656">← Organises posts</p>
+<p style="position:absolute; top:582px; left:336px; width:320px; font-size:24px; font-style:italic; line-height:1.4; text-align:right; color:#6e6656">Organises the cat →</p>
+</div>
+</div>
+
+<div style="position:absolute;left:128px;bottom:56px;display:flex;align-items:center;gap:14px">
+<img src="media/luna-polaroid.png" alt="" style="width:40px;height:42px;object-fit:contain">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:700;color:#1a1810">CatsMe</p>
+</div>
+<p style="position:absolute;right:128px;bottom:64px;width:1240px;text-align:right;font-size:24px;color:#6e6656">Google Play · App Store · checked Oct 2026</p>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="8 of 12" data-title="Density first. Revenue second.">
+<section class="slide" id="model" data-transition="fade" style="background:#0c0d11">
+  <div id="e1-1czgcii" style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#f5f0e8">CatsMe</p>
+  </div>
+  <div id="pac0a86167179r0-a9ef9755" style="position:absolute; top:128px; left:128px; width:1664px; height:141px; display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#ffcb45">BUSINESS MODEL</p>
+    <h2 style="font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#f5f0e8">Density first. Revenue second.</h2>
+  </div>
+  <div id="pac0a86167179r1-a9ef9755" style="position:absolute; top:306px; left:128px; width:1664px; height:614px; display:flex; flex-direction:row; gap:56px; align-items:center">
+    <div style="display:flex; flex-direction:column; gap:32px; flex:1">
+      <div style="display:flex; flex-direction:column; gap:32px">
+        <div style="display:flex; flex-direction:row; gap:20px; align-items:stretch">
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:28px 32px; background:#1c1d24; border-top:8px solid #4a4840; border-radius:24px">
+            <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:2px; color:#a89e8c">01 NOW</p>
+            <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:38px; font-weight:700; line-height:1.1; color:#f5f0e8">Free for everyone</h3>
+            <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">No revenue, on purpose: we grow density street by street.</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:28px 32px; background:#1c1d24; border-top:8px solid #ecb72c; border-radius:24px">
+            <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:2px; color:#a89e8c">02 THEN · LOCAL</p>
+            <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:38px; font-weight:700; line-height:1.1; color:#f5f0e8">Neighbourhood sponsors</h3>
+            <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">Vets and pet-food brands sponsor missions and rewards near them.</p>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:row; gap:20px; align-items:stretch">
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:28px 32px; background:#1c1d24; border-top:8px solid #cd7e05; border-radius:24px">
+            <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:2px; color:#a89e8c">03 NEXT · B2G</p>
+            <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:38px; font-weight:700; line-height:1.1; color:#f5f0e8">City dashboard</h3>
+            <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">A live street-cat census and sterilisation planning, sold to municipalities.</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1; padding:28px 32px; background:#ecb72c; border-top:8px solid #ecb72c; border-radius:24px">
+            <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:2px; color:#6b5008">ALWAYS</p>
+            <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:38px; font-weight:700; line-height:1.1; color:#1a1810">0% on donations</h3>
+            <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#3d2f06">Gifts go to local charities’ own pages. Trust is the product.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="9 of 12" data-title="Android prototype is in closed beta">
+<section class="slide" id="status" data-transition="fade" style="background:#f5f0e8">
+  <div id="e1-1fouhgv" style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+  <div id="pd55e8fda2b7er0-68db3b49" style="position:absolute; top:128px; left:128px; width:1664px; height:141px; display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#8a5c04">WHERE DO WE STAND</p>
+    <h2 style="font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">Android prototype is in closed beta</h2>
+  </div>
+  <div id="pd55e8fda2b7er2-68db3b49" style="position:absolute; top:555px; left:128px; width:1664px; height:160px; display:flex; flex-direction:column">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1664 20" aria-label="Six-month timeline" style="position:absolute; top:126px; left:0; width:1664px; height:20px"><path d="M10 10H1654" stroke="#e4ddd0" stroke-width="6" stroke-linecap="round"/></svg>
+    <p style="position:absolute; top:0; left:0; width:340px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; color:#8a5c04">NOW</p>
+    <p style="position:absolute; top:34px; left:0; width:340px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; line-height:1.25; color:#1a1810">Android prototype</p>
+    <p style="position:absolute; top:0; left:358px; width:400px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; text-align:center; color:#8a5c04">MONTH 2</p>
+    <p style="position:absolute; top:34px; left:358px; width:400px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; line-height:1.25; text-align:center; color:#1a1810">One real neighbourhood</p>
+    <p style="position:absolute; top:0; left:898px; width:400px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; text-align:center; color:#8a5c04">MONTH 4</p>
+    <p style="position:absolute; top:34px; left:898px; width:400px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; line-height:1.25; text-align:center; color:#1a1810">Google Play &amp; iOS</p>
+    <p style="position:absolute; top:0; left:1284px; width:380px; font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; text-align:right; color:#8a5c04">MONTH 6</p>
+    <p style="position:absolute; top:34px; left:1284px; width:380px; font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; font-weight:700; line-height:1.25; text-align:right; color:#1a1810">First municipal pilot</p>
+    <div class="xs" style="position:absolute; top:110px; left:1612px; width:52px; height:52px; background:#ecb72c; border:4px solid #1a1810; border-radius:50%"></div>
+    <div class="xs" style="position:absolute; top:118px; left:0; width:36px; height:36px; background:#8a5c04; border-radius:50%"></div>
+    <div class="xs" style="position:absolute; top:118px; left:540px; width:36px; height:36px; background:#8a5c04; border-radius:50%"></div>
+    <div class="xs" style="position:absolute; top:118px; left:1080px; width:36px; height:36px; background:#8a5c04; border-radius:50%"></div>
+  </div>
+  <div id="pd55e8fda2b7er3-68db3b49" style="position:absolute; top:757px; left:128px; width:1664px; height:163px; display:flex; flex-direction:row; gap:40px; align-items:center; padding:32px 48px; background:#0c0d11; border-radius:28px">
+    <img src="media/koumbaroi-badge.png" alt="" style="width:96px; height:97px; object-fit:contain">
+    <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:38px; line-height:1.3; color:#f5f0e8"><span style="color:#ffcb45"><b>NORTH-STAR</b></span><br>Cats that <span style="color:#ffcb45"><b>2+ neighbours checked on this week</b></span>. If that grows, it works.</p>
+  </div>
+  <div id="pd55e8fda2b7er1_1-68db3b49" style="position:absolute; top:299.94px; left:128px; width:908.78px; height:175.88px; display:flex; flex-direction:column; gap:14px; padding:36px 40px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:24px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:3px; color:#6e6656">NOT YET</p>
+    <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.45; color:#1a1810">iOS · public Play Store release · street map · a real neighbourhood</p>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="10 of 12" data-title="Why we need the Hackathon">
+<section class="slide" id="ask" data-transition="fade" style="background:#0c0d11">
+  <div id="p7fcac3e64317r0-a5943ae8" style="position:absolute; top:128px; left:128px; width:1664px; height:141px; display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#ffcb45">WHY US</p>
+    <h2 style="width:1540px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#f5f0e8">Why we need the Hackathon</h2>
+  </div>
+  <div id="p7fcac3e64317r1-a5943ae8" style="position:absolute; top:372px; left:128px; width:1664px; height:353px; display:flex; flex-direction:row; gap:28px">
+    <div style="display:flex; flex-direction:column; gap:16px; flex:1; padding:40px; background:#1c1d24; border-radius:24px">
+      <div style="width:80px; height:80px; display:flex; flex-direction:row; align-items:center; justify-content:center; flex:0 0 auto; background:#3d2e08; border-radius:22px">
+        <span class="xi" style="width:44px; height:44px; color:#ffcb45"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M125.18,156.94a64,64,0,1,0-82.36,0,100.23,100.23,0,0,0-39.49,32,12,12,0,0,0,19.35,14.2,76,76,0,0,1,122.64,0,12,12,0,0,0,19.36-14.2A100.33,100.33,0,0,0,125.18,156.94ZM44,108a40,40,0,1,1,40,40A40,40,0,0,1,44,108Zm206.1,97.67a12,12,0,0,1-16.78-2.57A76.31,76.31,0,0,0,172,172a12,12,0,0,1,0-24,40,40,0,1,0-10.3-78.67,12,12,0,1,1-6.16-23.19,64,64,0,0,1,57.64,110.8,100.23,100.23,0,0,1,39.49,32A12,12,0,0,1,250.1,205.67Z"/></svg></span>
+      </div>
+      <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:36px; font-weight:700; line-height:1.2; color:#f5f0e8">Introductions</h3>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">Municipalities and animal-welfare groups for a first pilot.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:16px; flex:1; padding:40px; background:#1c1d24; border-radius:24px">
+      <div style="width:80px; height:80px; display:flex; flex-direction:row; align-items:center; justify-content:center; flex:0 0 auto; background:#3d2e08; border-radius:22px">
+        <span class="xi" style="width:44px; height:44px; color:#ffcb45"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M180,232a12,12,0,0,1-12,12H88a12,12,0,0,1,0-24h80A12,12,0,0,1,180,232Zm40-128a91.51,91.51,0,0,1-35.17,72.35A12.26,12.26,0,0,0,180,186v2a20,20,0,0,1-20,20H96a20,20,0,0,1-20-20v-2a12,12,0,0,0-4.7-9.51A91.57,91.57,0,0,1,36,104.52C35.73,54.69,76,13.2,125.79,12A92,92,0,0,1,220,104Zm-24,0a68,68,0,0,0-69.65-68C89.56,36.88,59.8,67.55,60,104.38a67.71,67.71,0,0,0,26.1,53.19A35.87,35.87,0,0,1,100,184h56.1A36.13,36.13,0,0,1,170,157.49,67.68,67.68,0,0,0,196,104Zm-20.07-5.32a48.5,48.5,0,0,0-31.91-40,12,12,0,0,0-8,22.62,24.31,24.31,0,0,1,16.09,20,12,12,0,0,0,23.86-2.64Z"/></svg></span>
+      </div>
+      <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:36px; font-weight:700; line-height:1.2; color:#f5f0e8">Mentoring</h3>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">Go-to-market and a sustainable B2G model.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:16px; flex:1; padding:40px; background:#1c1d24; border-radius:24px">
+      <div style="width:80px; height:80px; display:flex; flex-direction:row; align-items:center; justify-content:center; flex:0 0 auto; background:#3d2e08; border-radius:22px">
+        <span class="xi" style="width:44px; height:44px; color:#ffcb45"><svg aria-hidden="true" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228.75,100.05c-3.52-3.67-7.15-7.46-8.34-10.33-1.06-2.56-1.14-7.83-1.21-12.47-.15-10-.34-22.44-9.18-31.27s-21.27-9-31.27-9.18c-4.64-.07-9.91-.15-12.47-1.21-2.87-1.19-6.66-4.82-10.33-8.34C148.87,20.46,140.05,12,128,12s-20.87,8.46-27.95,15.25c-3.67,3.52-7.46,7.15-10.33,8.34-2.56,1.06-7.83,1.14-12.47,1.21C67.25,37,54.81,37.14,46,46S37,67.25,36.8,77.25c-.07,4.64-.15,9.91-1.21,12.47-1.19,2.87-4.82,6.66-8.34,10.33C20.46,107.13,12,116,12,128S20.46,148.87,27.25,156c3.52,3.67,7.15,7.46,8.34,10.33,1.06,2.56,1.14,7.83,1.21,12.47.15,10,.34,22.44,9.18,31.27s21.27,9,31.27,9.18c4.64.07,9.91.15,12.47,1.21,2.87,1.19,6.66,4.82,10.33,8.34C107.13,235.54,116,244,128,244s20.87-8.46,27.95-15.25c3.67-3.52,7.46-7.15,10.33-8.34,2.56-1.06,7.83-1.14,12.47-1.21,10-.15,22.44-.34,31.27-9.18s9-21.27,9.18-31.27c.07-4.64.15-9.91,1.21-12.47,1.19-2.87,4.82-6.66,8.34-10.33C235.54,148.87,244,140.05,244,128S235.54,107.13,228.75,100.05Zm-17.32,39.29c-4.82,5-10.28,10.72-13.19,17.76-2.82,6.8-2.93,14.16-3,21.29-.08,5.36-.19,12.71-2.15,14.66s-9.3,2.07-14.66,2.15c-7.13.11-14.49.22-21.29,3-7,2.91-12.73,8.37-17.76,13.19C135.78,214.84,130.4,220,128,220s-7.78-5.16-11.34-8.57c-5-4.82-10.72-10.28-17.76-13.19-6.8-2.82-14.16-2.93-21.29-3-5.36-.08-12.71-.19-14.66-2.15s-2.07-9.3-2.15-14.66c-.11-7.13-.22-14.49-3-21.29-2.91-7-8.37-12.73-13.19-17.76C41.16,135.78,36,130.4,36,128s5.16-7.78,8.57-11.34c4.82-5,10.28-10.72,13.19-17.76,2.82-6.8,2.93-14.16,3-21.29C60.88,72.25,61,64.9,63,63s9.3-2.07,14.66-2.15c7.13-.11,14.49-.22,21.29-3,7-2.91,12.73-8.37,17.76-13.19C120.22,41.16,125.6,36,128,36s7.78,5.16,11.34,8.57c5,4.82,10.72,10.28,17.76,13.19,6.8,2.82,14.16,2.93,21.29,3,5.36.08,12.71.19,14.66,2.15s2.07,9.3,2.15,14.66c.11,7.13.22,14.49,3,21.29,2.91,7,8.37,12.73,13.19,17.76,3.41,3.56,8.57,8.94,8.57,11.34S214.84,135.78,211.43,139.34ZM176.49,95.51a12,12,0,0,1,0,17l-56,56a12,12,0,0,1-17,0l-24-24a12,12,0,1,1,17-17L112,143l47.51-47.52A12,12,0,0,1,176.49,95.51Z"/></svg></span>
+      </div>
+      <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:36px; font-weight:700; line-height:1.2; color:#f5f0e8">Buyers by law</h3>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:28px; line-height:1.4; color:#a89e8c">17,700+ councils must already manage street cats by law.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; flex:1.35; padding:40px; background:#ecb72c; border-radius:24px">
+      <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:36px; font-weight:700; line-height:1.2; color:#1a1810">The team</h3>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#3d2f06"><a href="https://www.linkedin.com/in/panagiotis-karadaglis/"><b><u>Panagiotis Karadaglis</u></b></a> Product designer</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.4; color:#3d2f06"><a href="https://www.instagram.com/katgiannik/"><b><u>Katerina Gianniki</u></b></a><br>Graphic designer</p>
+    </div>
+  </div>
+  <div id="p7fcac3e64317r2-a5943ae8" style="position:absolute; top:829px; left:128px; width:1664px; height:123px; display:flex; flex-direction:row; align-items:center; justify-content:space-between">
+    <div style="display:flex; flex-direction:row; gap:32px; align-items:center">
+      <img src="media/luna-polaroid.png" alt="Luna in her polaroid frame, the CatsMe logo" style="width:116px; height:123px; object-fit:contain; transform:rotate(-4deg)">
+      <p style="font-family:Mynerve, 'Brush Script MT', serif; font-size:64px; color:#ffcb45">Cats me if you can</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:end">
+      <div style="position:relative; width:360px; height:96px; display:flex; flex-direction:column; align-self:stretch">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" aria-label="Gold button with cat ears" style="position:absolute; top:0; left:0; width:360px; height:96px"><path d="M37 22H52L64.8 6L92 22H268L295.2 6L308 22H323A37 37 0 0 1 323 96H37A37 37 0 0 1 37 22Z" fill="#ecb72c"/></svg>
+        <div style="position:absolute; top:22px; left:0; width:360px; height:74px; display:flex; flex-direction:row; gap:12px; align-items:center; justify-content:center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.5 -1.5 27 27" aria-label="Link" style="width:28px; height:28px; flex:0 0 auto"><g fill="none" stroke="#020107" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>
+          <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; font-weight:700; line-height:1.2; color:#020107"><a href="https://catchcats.me">catchcats.me</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="11 of 12" data-title="What we’ll do with the 1.500€">
+<section class="slide" id="prize" data-transition="fade" style="background:#f5f0e8">
+  <div id="e1-6h2xwv" style="position:absolute; bottom:56px; left:128px; display:flex; flex-direction:row; gap:14px; align-items:center">
+    <img src="media/luna-polaroid.png" alt="" style="width:40px; height:42px; object-fit:contain">
+    <p style="font-family:'Source Serif 4', Georgia, serif; font-size:28px; font-weight:700; color:#1a1810">CatsMe</p>
+  </div>
+  <div id="pc39b3be1bc5dr0-7681f3b9" style="position:absolute; top:128px; left:128px; width:1664px; display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:#8a5c04">USE OF FUNDS</p>
+    <h2 style="width:1600px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; color:#1a1810">What we’ll do with the 1.500€</h2>
+  </div>
+  <div id="pc39b3be1bc5dr1-7681f3b9" style="position:absolute; top:329px; left:128px; width:1664px; height:591px; display:flex; flex-direction:column; gap:24px">
+    <div style="display:grid; gap:48px; align-items:center; grid-template-columns:700px 1fr">
+      <div style="display:flex; flex-direction:row; gap:24px; align-items:center">
+        <div style="width:560px; height:64px; display:flex; flex-direction:column; flex:0 0 auto; background:#ecb72c; border-radius:32px">
+        </div>
+        <p style="font-family:'Source Serif 4', Georgia, serif; font-size:48px; font-weight:700; line-height:1; color:#1a1810">€700</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Grow the first neighbourhood <span style="color:#8a5c04">· month 2</span></h3>
+        <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.35; color:#6e6656">€300 · local social-media ads to sign up the first users<br>€150 · QR stickers and posters on the pilot streets<br>€150 · a launch meetup for the street at local cat cafés<br>€100 · food for the neighbourhood’s feeding points</p>
+      </div>
+    </div>
+    <div style="display:grid; gap:48px; align-items:center; grid-template-columns:700px 1fr">
+      <div style="display:flex; flex-direction:row; gap:24px; align-items:center">
+        <div style="width:240px; height:64px; display:flex; flex-direction:column; flex:0 0 auto; background:#8a5c04; border-radius:32px">
+        </div>
+        <p style="font-family:'Source Serif 4', Georgia, serif; font-size:48px; font-weight:700; line-height:1; color:#1a1810">€300</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Run the app <span style="color:#8a5c04">· months 1–6</span></h3>
+        <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.35; color:#6e6656">€150 · database and photo storage, ≈ €25 a month<br>€150 · the tools inside the app, ≈ €25 a month</p>
+      </div>
+    </div>
+    <div style="display:grid; gap:48px; align-items:center; grid-template-columns:700px 1fr">
+      <div style="display:flex; flex-direction:row; gap:24px; align-items:center">
+        <div style="width:240px; height:64px; display:flex; flex-direction:column; flex:0 0 auto; background:#6e6656; border-radius:32px">
+        </div>
+        <p style="font-family:'Source Serif 4', Georgia, serif; font-size:48px; font-weight:700; line-height:1; color:#1a1810">€300</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Launch legally <span style="color:#8a5c04">· months 3–4</span></h3>
+        <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.35; color:#6e6656">€175 · lawyer review of privacy policy, terms and consent<br>€125 · Apple (€99 a year) and Google Play ($25) accounts</p>
+      </div>
+    </div>
+    <div style="display:grid; gap:48px; align-items:center; grid-template-columns:700px 1fr">
+      <div style="display:flex; flex-direction:row; gap:24px; align-items:center">
+        <div style="width:160px; height:64px; display:flex; flex-direction:column; flex:0 0 auto; background:#1a1810; border-radius:32px">
+        </div>
+        <p style="font-family:'Source Serif 4', Georgia, serif; font-size:48px; font-weight:700; line-height:1; color:#1a1810">€200</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h3 style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:30px; font-weight:700; line-height:1.2; color:#1a1810">Win the first city <span style="color:#8a5c04">· months 4–6</span></h3>
+        <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:26px; line-height:1.35; color:#6e6656">€120 · a workshop for the city’s vets and welfare groups<br>€80 · &nbsp;prints for the pilot meetings</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="frame" role="group" aria-roledescription="slide" aria-label="12 of 12" data-title="See often a cat on your street?">
+<section class="slide" id="back" data-transition="fade" style="background:#0c0d11">
+  <div id="p535c639c89f6r1-8611fccc" style="position:absolute; top:404px; left:488px; width:944px; height:411px; display:flex; flex-direction:row; gap:64px">
+    <div style="width:440px; display:flex; flex-direction:column; gap:14px; align-items:center; padding:32px; background:#f5f0e8; border-radius:32px">
+      <div style="position:relative; width:240px; height:240px; display:flex; flex-direction:column; align-self:center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 41 41" aria-label="QR code: opens a new email to hello@catchcats.me" style="position:absolute; top:0; left:0; width:240px; height:240px"><rect x="-2" y="-2" width="41" height="41" fill="#f5f0e8"/><path d="M0 0h7v1h-7zM8 0h1v1h-1zM11 0h3v1h-3zM16 0h1v1h-1zM18 0h1v1h-1zM20 0h2v1h-2zM23 0h1v1h-1zM28 0h1v1h-1zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h3v1h-3zM13 1h1v1h-1zM15 1h1v1h-1zM17 1h1v1h-1zM23 1h3v1h-3zM27 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM11 2h2v1h-2zM15 2h1v1h-1zM17 2h1v1h-1zM19 2h2v1h-2zM22 2h1v1h-1zM24 2h1v1h-1zM27 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM13 3h5v1h-5zM19 3h2v1h-2zM22 3h1v1h-1zM24 3h3v1h-3zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM9 4h1v1h-1zM13 4h3v1h-3zM17 4h1v1h-1zM19 4h1v1h-1zM21 4h3v1h-3zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h2v1h-2zM13 5h1v1h-1zM15 5h1v1h-1zM17 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM27 5h1v1h-1zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM8 7h2v1h-2zM12 7h3v1h-3zM17 7h1v1h-1zM19 7h1v1h-1zM21 7h1v1h-1zM2 8h3v1h-3zM6 8h1v1h-1zM8 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM18 8h3v1h-3zM29 8h3v1h-3zM34 8h3v1h-3zM0 9h2v1h-2zM4 9h1v1h-1zM7 9h2v1h-2zM11 9h3v1h-3zM15 9h1v1h-1zM19 9h2v1h-2zM24 9h2v1h-2zM27 9h1v1h-1zM29 9h1v1h-1zM31 9h1v1h-1zM34 9h1v1h-1zM0 10h1v1h-1zM6 10h2v1h-2zM9 10h1v1h-1zM11 10h1v1h-1zM13 10h3v1h-3zM17 10h2v1h-2zM21 10h4v1h-4zM27 10h3v1h-3zM36 10h1v1h-1zM1 11h2v1h-2zM5 11h1v1h-1zM7 11h1v1h-1zM10 11h2v1h-2zM13 11h1v1h-1zM15 11h1v1h-1zM18 11h2v1h-2zM22 11h1v1h-1zM24 11h1v1h-1zM27 11h2v1h-2zM30 11h2v1h-2zM35 11h1v1h-1zM2 12h1v1h-1zM4 12h5v1h-5zM10 12h3v1h-3zM18 12h1v1h-1zM20 12h2v1h-2zM24 12h4v1h-4zM29 12h5v1h-5zM36 12h1v1h-1zM0 13h5v1h-5zM7 13h4v1h-4zM12 13h1v1h-1zM14 13h6v1h-6zM21 13h2v1h-2zM24 13h1v1h-1zM28 13h2v1h-2zM34 13h1v1h-1zM0 14h3v1h-3zM4 14h1v1h-1zM6 14h1v1h-1zM8 14h3v1h-3zM13 14h1v1h-1zM15 14h2v1h-2zM25 14h1v1h-1zM27 14h2v1h-2zM30 14h2v1h-2zM35 14h2v1h-2zM2 15h3v1h-3zM10 15h2v1h-2zM14 15h3v1h-3zM18 15h1v1h-1zM22 15h1v1h-1zM24 15h1v1h-1zM26 15h6v1h-6zM36 15h1v1h-1zM6 16h1v1h-1zM9 16h2v1h-2zM12 16h3v1h-3zM17 16h4v1h-4zM22 16h2v1h-2zM25 16h3v1h-3zM29 16h2v1h-2zM32 16h4v1h-4zM4 17h2v1h-2zM14 17h1v1h-1zM16 17h1v1h-1zM18 17h2v1h-2zM22 17h4v1h-4zM28 17h2v1h-2zM31 17h1v1h-1zM34 17h1v1h-1zM0 18h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM8 18h2v1h-2zM14 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM27 18h3v1h-3zM31 18h2v1h-2zM34 18h3v1h-3zM0 19h1v1h-1zM2 19h4v1h-4zM7 19h2v1h-2zM10 19h1v1h-1zM15 19h3v1h-3zM19 19h1v1h-1zM22 19h1v1h-1zM29 19h1v1h-1zM36 19h1v1h-1zM0 20h1v1h-1zM3 20h6v1h-6zM13 20h4v1h-4zM18 20h2v1h-2zM21 20h2v1h-2zM25 20h6v1h-6zM32 20h2v1h-2zM0 21h3v1h-3zM4 21h1v1h-1zM7 21h4v1h-4zM16 21h5v1h-5zM23 21h1v1h-1zM25 21h1v1h-1zM29 21h1v1h-1zM31 21h1v1h-1zM34 21h2v1h-2zM0 22h1v1h-1zM3 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM15 22h2v1h-2zM18 22h2v1h-2zM21 22h1v1h-1zM24 22h5v1h-5zM30 22h2v1h-2zM33 22h2v1h-2zM36 22h1v1h-1zM0 23h4v1h-4zM5 23h1v1h-1zM11 23h1v1h-1zM13 23h1v1h-1zM17 23h1v1h-1zM19 23h1v1h-1zM22 23h4v1h-4zM28 23h2v1h-2zM32 23h1v1h-1zM36 23h1v1h-1zM0 24h1v1h-1zM2 24h6v1h-6zM9 24h4v1h-4zM14 24h1v1h-1zM19 24h3v1h-3zM23 24h2v1h-2zM26 24h1v1h-1zM29 24h8v1h-8zM0 25h3v1h-3zM5 25h1v1h-1zM8 25h3v1h-3zM13 25h3v1h-3zM17 25h1v1h-1zM20 25h1v1h-1zM28 25h1v1h-1zM30 25h2v1h-2zM33 25h1v1h-1zM35 25h1v1h-1zM0 26h1v1h-1zM3 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h7v1h-7zM18 26h2v1h-2zM21 26h4v1h-4zM26 26h6v1h-6zM34 26h3v1h-3zM0 27h1v1h-1zM3 27h2v1h-2zM7 27h3v1h-3zM11 27h1v1h-1zM14 27h1v1h-1zM21 27h1v1h-1zM23 27h1v1h-1zM26 27h3v1h-3zM30 27h1v1h-1zM36 27h1v1h-1zM0 28h1v1h-1zM3 28h6v1h-6zM10 28h2v1h-2zM13 28h1v1h-1zM17 28h3v1h-3zM21 28h1v1h-1zM23 28h1v1h-1zM25 28h2v1h-2zM28 28h9v1h-9zM8 29h2v1h-2zM12 29h3v1h-3zM16 29h1v1h-1zM19 29h1v1h-1zM21 29h3v1h-3zM28 29h1v1h-1zM32 29h2v1h-2zM0 30h7v1h-7zM9 30h1v1h-1zM14 30h1v1h-1zM16 30h2v1h-2zM21 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM35 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM11 31h1v1h-1zM13 31h12v1h-12zM26 31h1v1h-1zM28 31h1v1h-1zM32 31h1v1h-1zM36 31h1v1h-1zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h6v1h-6zM15 32h2v1h-2zM18 32h1v1h-1zM21 32h2v1h-2zM25 32h11v1h-11zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h2v1h-2zM11 33h2v1h-2zM18 33h2v1h-2zM21 33h2v1h-2zM24 33h1v1h-1zM26 33h1v1h-1zM28 33h3v1h-3zM32 33h2v1h-2zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM8 34h1v1h-1zM10 34h1v1h-1zM15 34h2v1h-2zM18 34h1v1h-1zM20 34h3v1h-3zM26 34h2v1h-2zM31 34h1v1h-1zM33 34h1v1h-1zM36 34h1v1h-1zM0 35h1v1h-1zM6 35h1v1h-1zM11 35h4v1h-4zM16 35h2v1h-2zM19 35h2v1h-2zM24 35h1v1h-1zM26 35h6v1h-6zM36 35h1v1h-1zM0 36h7v1h-7zM9 36h1v1h-1zM11 36h1v1h-1zM13 36h2v1h-2zM18 36h2v1h-2zM21 36h2v1h-2zM24 36h3v1h-3zM30 36h7v1h-7z" fill="#1a1810"/></svg>
+        <div style="position:absolute; top:94px; left:94px; width:52px; height:52px; display:flex; flex-direction:column; background:#f5f0e8; border-radius:12px">
+        </div>
+        <img src="media/luna-polaroid.png" alt="" style="position:absolute; top:97px; left:98px; width:44px; height:46px; object-fit:contain">
+      </div>
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">CONTACT</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; font-weight:700; color:#1a1810">hello@catchcats.me</p>
+    </div>
+    <div style="width:440px; display:flex; flex-direction:column; gap:14px; align-items:center; padding:32px; background:#f5f0e8; border-radius:32px">
+      <div style="position:relative; width:240px; height:240px; display:flex; flex-direction:column; align-self:center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 37 37" aria-label="QR code: opens the Android demo download page, catchcats.me/android" style="position:absolute; top:0; left:0; width:240px; height:240px"><rect x="-2" y="-2" width="37" height="37" fill="#f5f0e8"/><path d="M0 0h7v1h-7zM8 0h2v1h-2zM12 0h7v1h-7zM20 0h1v1h-1zM22 0h3v1h-3zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h3v1h-3zM14 1h6v1h-6zM21 1h3v1h-3zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h2v1h-2zM13 2h1v1h-1zM16 2h3v1h-3zM20 2h1v1h-1zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM14 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM22 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM14 4h1v1h-1zM17 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM11 5h2v1h-2zM18 5h2v1h-2zM21 5h3v1h-3zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM10 7h1v1h-1zM12 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM21 7h2v1h-2zM24 7h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM9 8h2v1h-2zM12 8h5v1h-5zM18 8h4v1h-4zM24 8h1v1h-1zM27 8h3v1h-3zM31 8h2v1h-2zM1 9h2v1h-2zM4 9h1v1h-1zM7 9h1v1h-1zM9 9h2v1h-2zM12 9h1v1h-1zM15 9h1v1h-1zM17 9h1v1h-1zM19 9h4v1h-4zM24 9h1v1h-1zM26 9h1v1h-1zM30 9h3v1h-3zM1 10h3v1h-3zM5 10h2v1h-2zM8 10h4v1h-4zM13 10h4v1h-4zM19 10h1v1h-1zM24 10h3v1h-3zM32 10h1v1h-1zM1 11h2v1h-2zM5 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM13 11h1v1h-1zM17 11h2v1h-2zM20 11h5v1h-5zM29 11h1v1h-1zM1 12h6v1h-6zM8 12h2v1h-2zM11 12h4v1h-4zM18 12h1v1h-1zM22 12h5v1h-5zM28 12h1v1h-1zM32 12h1v1h-1zM0 13h1v1h-1zM2 13h1v1h-1zM4 13h1v1h-1zM8 13h1v1h-1zM11 13h3v1h-3zM17 13h2v1h-2zM20 13h1v1h-1zM24 13h1v1h-1zM26 13h5v1h-5zM32 13h1v1h-1zM0 14h2v1h-2zM3 14h1v1h-1zM5 14h2v1h-2zM8 14h1v1h-1zM11 14h1v1h-1zM16 14h2v1h-2zM21 14h1v1h-1zM23 14h1v1h-1zM25 14h2v1h-2zM28 14h1v1h-1zM30 14h2v1h-2zM0 15h1v1h-1zM4 15h1v1h-1zM10 15h4v1h-4zM15 15h4v1h-4zM21 15h2v1h-2zM26 15h2v1h-2zM31 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM4 16h3v1h-3zM11 16h1v1h-1zM13 16h1v1h-1zM17 16h1v1h-1zM20 16h2v1h-2zM26 16h1v1h-1zM28 16h1v1h-1zM0 17h1v1h-1zM8 17h2v1h-2zM11 17h1v1h-1zM14 17h1v1h-1zM18 17h1v1h-1zM21 17h1v1h-1zM23 17h1v1h-1zM25 17h1v1h-1zM27 17h1v1h-1zM30 17h2v1h-2zM1 18h8v1h-8zM10 18h1v1h-1zM13 18h7v1h-7zM25 18h1v1h-1zM27 18h2v1h-2zM30 18h3v1h-3zM1 19h1v1h-1zM5 19h1v1h-1zM9 19h2v1h-2zM13 19h1v1h-1zM16 19h1v1h-1zM21 19h2v1h-2zM26 19h1v1h-1zM28 19h1v1h-1zM31 19h2v1h-2zM0 20h5v1h-5zM6 20h5v1h-5zM13 20h5v1h-5zM19 20h3v1h-3zM23 20h1v1h-1zM25 20h2v1h-2zM31 20h2v1h-2zM1 21h2v1h-2zM4 21h2v1h-2zM7 21h3v1h-3zM11 21h5v1h-5zM17 21h2v1h-2zM21 21h3v1h-3zM25 21h1v1h-1zM29 21h1v1h-1zM31 21h2v1h-2zM0 22h2v1h-2zM6 22h2v1h-2zM9 22h2v1h-2zM12 22h1v1h-1zM15 22h3v1h-3zM21 22h1v1h-1zM25 22h2v1h-2zM29 22h4v1h-4zM1 23h3v1h-3zM7 23h1v1h-1zM9 23h3v1h-3zM15 23h1v1h-1zM18 23h4v1h-4zM25 23h2v1h-2zM29 23h1v1h-1zM0 24h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM6 24h4v1h-4zM11 24h1v1h-1zM16 24h1v1h-1zM18 24h4v1h-4zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h4v1h-4zM13 25h1v1h-1zM15 25h3v1h-3zM19 25h2v1h-2zM22 25h3v1h-3zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM9 26h13v1h-13zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h2v1h-2zM13 27h2v1h-2zM16 27h2v1h-2zM24 27h1v1h-1zM28 27h1v1h-1zM32 27h1v1h-1zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM10 28h1v1h-1zM19 28h1v1h-1zM22 28h1v1h-1zM24 28h5v1h-5zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h3v1h-3zM12 29h1v1h-1zM14 29h1v1h-1zM18 29h2v1h-2zM23 29h1v1h-1zM26 29h1v1h-1zM28 29h2v1h-2zM32 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM12 30h1v1h-1zM14 30h2v1h-2zM20 30h3v1h-3zM24 30h2v1h-2zM27 30h2v1h-2zM30 30h1v1h-1zM32 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM11 31h4v1h-4zM17 31h1v1h-1zM19 31h3v1h-3zM23 31h2v1h-2zM26 31h4v1h-4zM0 32h7v1h-7zM11 32h4v1h-4zM16 32h3v1h-3zM21 32h1v1h-1zM24 32h1v1h-1zM27 32h5v1h-5z" fill="#1a1810"/></svg>
+        <div style="position:absolute; top:94px; left:94px; width:52px; height:52px; display:flex; flex-direction:column; background:#f5f0e8; border-radius:12px">
+        </div>
+        <img src="media/luna-polaroid.png" alt="" style="position:absolute; top:97px; left:98px; width:44px; height:46px; object-fit:contain">
+      </div>
+      <p style="font-family:Comfortaa, Verdana, sans-serif; font-size:24px; font-weight:700; letter-spacing:4px; color:#8a5c04">ANDROID DEMO</p>
+      <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; font-weight:700; color:#1a1810">catchcats.me/android</p>
+    </div>
+  </div>
+  <p id="p535c639c89f6r2-8611fccc" style="position:absolute; top:974.69px; left:50%; width:1300px; font-family:Mynerve, 'Brush Script MT', serif; font-size:52px; text-align:center; color:#ffcb45; transform:translateX(-50%)">Cats me if you can</p>
+  <img src="media/luna-polaroid.png" alt="Luna in her polaroid frame, the CatsMe logo" id="p84c69f1150c6c0-7d29fbe5" style="position:absolute; top:122px; left:922px; width:76px; height:80px; object-fit:contain; transform:rotate(-4deg)">
+  <h2 id="p84c69f1150c6c1-7d29fbe5" style="position:absolute; top:216px; left:354px; width:1212px; font-family:'Source Serif 4', Georgia, serif; font-size:84px; font-weight:700; line-height:1.08; text-align:center; color:#f5f0e8">See often a cat on your street?</h2>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" aria-label="Gold button with cat ears" style="position:absolute; top:847px; left:780px; width:360px; height:96px"><path d="M37 22H52L64.8 6L92 22H268L295.2 6L308 22H323A37 37 0 0 1 323 96H37A37 37 0 0 1 37 22Z" fill="#ecb72c"/></svg>
+  <div style="position:absolute; top:869px; left:780px; width:360px; height:74px; display:flex; flex-direction:row; gap:12px; align-items:center; justify-content:center">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.5 -1.5 27 27" aria-label="Link" style="width:28px; height:28px; flex:0 0 auto"><g fill="none" stroke="#020107" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>
+    <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; font-weight:700; line-height:1.2; color:#020107"><a href="https://catchcats.me">catchcats.me</a></p>
+  </div>
+</section>
+</div>
+</main>
+<p class="sr" id="live" aria-live="polite"></p>
+<script>
+(() => {
+  const root = document.documentElement, body = document.body, stage = document.getElementById('stage');
+  const frames = [...document.querySelectorAll('.frame')], videos = [...document.querySelectorAll('.frame video')];
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  let i = 0, mode = '', io;
+
+  const fromHash = () => { const k = parseInt(location.hash.slice(1), 10); return k >= 1 && k <= frames.length ? k - 1 : 0; };
+
+  function playVideos() {
+    if (reduce.matches) { videos.forEach(v => { v.controls = true; v.pause(); }); return; }
+    if (mode === 'deck') videos.forEach(v => v.closest('.frame').classList.contains('on') ? v.play().catch(() => {}) : v.pause());
+  }
+
+  function show(k, announce = true) {
+    i = Math.max(0, Math.min(frames.length - 1, k));
+    frames.forEach((f, j) => {
+      const on = j === i;
+      f.classList.toggle('on', on);
+      f.inert = mode === 'deck' && !on;
+      if (mode === 'deck' && !on) f.setAttribute('aria-hidden', 'true'); else f.removeAttribute('aria-hidden');
+    });
+    $('count').textContent = (i + 1) + ' / ' + frames.length;
+    $('progress').style.transform = 'scaleX(' + (i + 1) / frames.length + ')';
+    $('prev').disabled = i === 0;
+    $('next').disabled = i === frames.length - 1;
+    if (mode === 'deck') history.replaceState(null, '', '#' + (i + 1));
+    if (announce) $('live').textContent = 'Slide ' + (i + 1) + ' of ' + frames.length + ': ' + frames[i].dataset.title;
+    playVideos();
+  }
+
+  function layout() {
+    const want = innerWidth > innerHeight ? 'deck' : 'list';
+    if (want !== mode) {
+      mode = want;
+      body.classList.toggle('deck', mode === 'deck');
+      if (io) io.disconnect();
+      if (mode === 'list' && !reduce.matches) {
+        io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause()), { threshold: .4 });
+        videos.forEach(v => io.observe(v));
+      }
+      show(i, false);
+      if (mode === 'list' && i > 0) requestAnimationFrame(() => frames[i].scrollIntoView({ block: 'center' }));
+    }
+    let s;
+    if (mode === 'deck') { const r = stage.getBoundingClientRect(); s = Math.min((r.width - 48) / 1920, (r.height - 40) / 1080); }
+    else s = Math.min(1, (root.clientWidth - 32) / 1920);
+    root.style.setProperty('--s', Math.max(.1, s));
+  }
+
+  $('prev').addEventListener('click', () => show(i - 1));
+  $('next').addEventListener('click', () => show(i + 1));
+  addEventListener('keydown', e => {
+    if (mode !== 'deck' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const onControl = e.target.closest('a,button');
+    if (['ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !onControl)) show(i + 1);
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) show(i - 1);
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(frames.length - 1);
+    else if (e.key === 'f' || e.key === 'F') toggleFull();
+    else return;
+    e.preventDefault();
+  });
+  // A click on the slide moves on (the left third goes back); links and the video keep their own clicks.
+  stage.addEventListener('click', e => {
+    if (mode !== 'deck' || e.target.closest('a,button,video')) return;
+    const r = stage.getBoundingClientRect();
+    show(e.clientX - r.left < r.width / 3 ? i - 1 : i + 1);
+  });
+  let x0 = null, y0 = 0;
+  stage.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { x0 = e.clientX; y0 = e.clientY; } });
+  stage.addEventListener('pointerup', e => {
+    if (x0 === null || mode !== 'deck') return;
+    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(dx < 0 ? i + 1 : i - 1);
+  });
+
+  function toggleFull() {
+    if (!document.fullscreenEnabled) return;
+    document.fullscreenElement ? document.exitFullscreen() : root.requestFullscreen().catch(() => {});
+  }
+  if (document.fullscreenEnabled) $('fs').addEventListener('click', toggleFull); else $('fs').hidden = true;
+  document.addEventListener('fullscreenchange', () => { $('fs').setAttribute('aria-pressed', !!document.fullscreenElement); layout(); });
+
+  addEventListener('hashchange', () => { if (mode === 'deck') show(fromHash()); });
+  addEventListener('resize', layout);
+  i = fromHash();
+  layout();
+})();
+</script>
+</body>
+</html>
