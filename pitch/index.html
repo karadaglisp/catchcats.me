@@ -73,6 +73,13 @@ body.deck .hint{display:none}
 body.deck .tools{min-width:120px;display:flex;justify-content:flex-end}
 body:not(.deck) :is(.tools,.progress){display:none}
 @media (prefers-reduced-motion: reduce){body.deck .frame,body.deck .frame.on,.progress,button{transition:none}}
+.slide img[data-zoom]{cursor:zoom-in}
+#lightbox{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(8,9,12,.86);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#lightbox.on{display:flex}
+#lightbox img{max-width:min(460px,92vw);max-height:88vh;height:auto;border-radius:8px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+#lightbox button{position:absolute;top:18px;right:18px;width:46px;height:46px;background:rgba(245,240,232,.14);color:var(--text)}
+#lightbox button:hover{background:rgba(245,240,232,.26)}
+#lightbox button svg{width:20px;height:20px;fill:currentColor}
 </style>
 </head>
 <body>
@@ -545,7 +552,7 @@ body:not(.deck) :is(.tools,.progress){display:none}
   </div>
   <div style="display:flex; flex-direction:row; gap:28px; align-items:center; flex:1">
     <div style="display:flex; flex-direction:row; gap:48px; align-items:center; flex:1; padding:48px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:28px">
-      <img src="media/team-panos-polaroid.png" alt="Panos holding up a rescued kitten, in a polaroid" style="width:268px; height:300px; flex:0 0 auto; border-radius:6px; box-shadow:0 16px 30px rgba(26,24,16,.24); transform:rotate(-4deg)">
+      <img src="media/team-panos-polaroid.png" data-zoom="1" alt="Panos holding up a rescued kitten, in a polaroid" style="width:291px; height:330px; flex:0 0 auto; border-radius:6px; box-shadow:0 16px 30px rgba(26,24,16,.24); transform:rotate(-4deg)">
       <div style="display:flex; flex-direction:column; gap:14px">
         <h3 style="font-family:'Source Serif 4', Georgia, serif; font-size:52px; font-weight:700; line-height:1.1; color:#1a1810">Panos Karadaglis</h3>
         <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; line-height:1.4; color:#6e6656">Product designer</p>
@@ -557,7 +564,7 @@ body:not(.deck) :is(.tools,.progress){display:none}
       </div>
     </div>
     <div style="display:flex; flex-direction:row; gap:48px; align-items:center; flex:1; padding:48px; background:#faf6ee; border:1px solid #e4ddd0; border-radius:28px">
-      <img src="media/team-katerina-polaroid.png" alt="Katerina meeting a street cat, in a polaroid" style="width:332px; height:300px; flex:0 0 auto; border-radius:6px; box-shadow:0 16px 30px rgba(26,24,16,.24); transform:rotate(3deg)">
+      <img src="media/team-katerina-polaroid.png" data-zoom="1" alt="Katerina meeting a street cat, in a polaroid" style="width:361px; height:330px; flex:0 0 auto; border-radius:6px; box-shadow:0 16px 30px rgba(26,24,16,.24); transform:rotate(3deg)">
       <div style="display:flex; flex-direction:column; gap:14px">
         <h3 style="font-family:'Source Serif 4', Georgia, serif; font-size:52px; font-weight:700; line-height:1.1; color:#1a1810">Katerina Gianniki</h3>
         <p style="font-family:'Zen Maru Gothic', Verdana, sans-serif; font-size:32px; line-height:1.4; color:#6e6656">Graphic designer</p>
@@ -611,6 +618,7 @@ body:not(.deck) :is(.tools,.progress){display:none}
 </div>
 </main>
 <p class="sr" id="live" aria-live="polite"></p>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview"><button id="lightbox-close" type="button" aria-label="Close preview"><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg></button><img id="lightbox-img" alt=""></div>
 <script>
 (() => {
   const root = document.documentElement, body = document.body, stage = document.getElementById('stage');
@@ -677,7 +685,7 @@ body:not(.deck) :is(.tools,.progress){display:none}
   });
   // A click on the slide moves on (the left third goes back); links and the video keep their own clicks.
   stage.addEventListener('click', e => {
-    if (mode !== 'deck' || e.target.closest('a,button,video')) return;
+    if (mode !== 'deck' || e.target.closest('a,button,video,[data-zoom]')) return;
     const r = stage.getBoundingClientRect();
     show(e.clientX - r.left < r.width / 3 ? i - 1 : i + 1);
   });
@@ -700,6 +708,23 @@ body:not(.deck) :is(.tools,.progress){display:none}
   addEventListener('resize', layout);
   i = fromHash();
   layout();
+})();
+</script>
+<script>
+/* Click a team polaroid (either mode) to see it full size. */
+(() => {
+  const lb = document.getElementById('lightbox'), img = document.getElementById('lightbox-img');
+  let opener = null;
+  const close = () => { lb.classList.remove('on'); img.removeAttribute('src'); if (opener) opener.focus(); opener = null; };
+  document.querySelectorAll('.slide img[data-zoom]').forEach(el => {
+    el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0');
+    const open = e => { e.preventDefault(); e.stopPropagation(); opener = el; img.src = el.currentSrc || el.src; img.alt = el.alt || ''; lb.classList.add('on'); document.getElementById('lightbox-close').focus(); };
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+  });
+  document.getElementById('lightbox-close').addEventListener('click', close);
+  lb.addEventListener('click', e => { if (e.target === lb) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('on')) { e.stopPropagation(); close(); } }, true);
 })();
 </script>
 </body>
