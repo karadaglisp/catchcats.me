@@ -134,12 +134,14 @@ section{padding-block:clamp(64px,10vw,112px)}
 @media (min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr}}
 .hero-copy{display:flex;flex-direction:column;gap:22px}
 .hero h1 em{font-style:normal;color:var(--ink-gold)}
-/* "Connect with cats" always sits on one line. The phrase is about 8.5em wide, so the headline
-   is sized to fit its column: the full width on a phone, the left column from 900px. */
+/* Two lines: "Connect with cats", then the rotating phrase, each on one line. The longest phrase,
+   "in your neighbourhood.", is about 11.5em wide, so from 520px the headline is sized to fit it in
+   its column. On a narrow phone that would be under 30px, so there the phrase keeps its break. */
 .hero h1{font-size:clamp(34px,calc((100vw - 32px) / 8.7),74px)}
 .hero h1 .lead-in{white-space:nowrap}
-@media (min-width:720px){.hero h1{font-size:min(74px,calc((100vw - 64px) / 8.7))}}
-@media (min-width:900px){.hero h1{font-size:calc((min(100vw,1140px) - 128px) * .0603)}}
+@media (min-width:520px){.rot-i br{display:none}.rot-i{white-space:nowrap}.hero h1{font-size:min(74px,calc((100vw - 32px) / 11.7))}}
+@media (min-width:720px){.hero h1{font-size:min(74px,calc((100vw - 64px) / 11.7))}}
+@media (min-width:900px){.hero h1{font-size:calc((min(100vw,1140px) - 128px) * .04487)}}
 /* The last two lines take turns. All of them sit in one grid cell, so the hero never changes height. */
 .rot{display:grid}
 .rot-i{grid-area:1/1;transition:opacity .45s ease,transform .45s ease}
@@ -364,7 +366,8 @@ section{padding-block:clamp(64px,10vw,112px)}
 .form input,.form select,.form textarea{font:16px/1.3 var(--body);color:var(--text-primary);background:var(--bg-surface);border:1.5px solid var(--border-strong);border-radius:12px;padding:12px 14px;width:100%;text-transform:none;letter-spacing:0}
 .form textarea{min-height:110px;resize:vertical}
 .form input:focus,.form select:focus,.form textarea:focus{outline:3px solid var(--action-primary);outline-offset:2px;border-color:var(--action-primary)}
-.form .btn{justify-self:start;margin-top:4px}
+.form .btn{justify-self:start;margin-top:4px;min-width:180px;justify-content:center}
+button.btn{cursor:pointer}
 
 /* ---------- final cta ---------- */
 .final{text-align:center}
@@ -421,6 +424,7 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
       <a href="#how">How it works</a>
       <a href="#koumbaroi">Koumbaroi</a>
       <a href="#mission">Our mission</a>
+      <a href="#contact" data-topic="other">Contact</a>
     </nav>
     <a class="btn btn-primary ears" href="#contact">Get early access</a>
   </div>
@@ -433,7 +437,7 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <p class="eyebrow">A neighbourhood app for stray cats</p>
-      <h1><span class="lead-in">Connect with <em>cats</em></span> <span class="rot"><span class="rot-i on">on <em>your<br>street.</em></span><span class="rot-i" aria-hidden="true">in <em>your<br>neighbourhood.</em></span><span class="rot-i" aria-hidden="true">in <em>your<br>city.</em></span><span class="rot-i" aria-hidden="true">on <em>your<br>island.</em></span></span></h1>
+      <h1><span class="lead-in">Connect with <em>cats</em></span> <span class="rot"><span class="rot-i on">on <em>your <br>street.</em></span><span class="rot-i" aria-hidden="true">in <em>your <br>neighbourhood.</em></span><span class="rot-i" aria-hidden="true">in <em>your <br>city.</em></span><span class="rot-i" aria-hidden="true">on <em>your <br>island.</em></span></span></h1>
       <p class="lede">Snap a stray and name it <svg class="heart-inline" viewBox="0 0 256 256" aria-hidden="true"><use href="#i-heart-fill"/></svg><br>If someone finds the same cat, agree on one name together!</p>
       <div class="cta-row">
         <a class="btn btn-primary ears" href="#contact">Get early access</a>
@@ -897,7 +901,7 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
         </select>
       </label>
       <label>Message <textarea name="message" rows="4" required></textarea></label>
-      <button class="btn btn-primary ears" type="submit">Send</button>
+      <button class="btn btn-primary ears" type="submit">Send message</button>
     </form>
     <p class="sign">Every street cat deserves a name.</p>
   </div>
@@ -1261,7 +1265,7 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
 (function(){
   var sel=document.getElementById('topic');
   document.querySelectorAll('a[href="#contact"]').forEach(function(a){
-    a.addEventListener('click',function(){ if(sel) sel.value='early access'; });
+    a.addEventListener('click',function(){ if(sel) sel.value=a.getAttribute('data-topic')||'early access'; });
   });
 })();
 </script>
