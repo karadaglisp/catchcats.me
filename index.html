@@ -33,6 +33,7 @@
      paper ochre from Polaroid.tsx instead; on the dark ground they take goldBright. */
   --ink-gold:#8a5c04;
   --action-tint:#f9f0d0;
+  --danger:#b3261e;
   --grid:#e4ddd0;
 
   --serif:'Source Serif 4', Georgia, serif;
@@ -48,14 +49,14 @@
     --bg-default:#0c0d11; --bg-surface:#1c1d24; --bg-elevated:#2e3040;
     --text-primary:#f5f0e8; --text-secondary:#a89e8c;
     --border-default:#2e3040; --border-strong:#4a4840;
-    --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040;
+    --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040; --danger:#ff8a7a;
   }
 }
 :root[data-theme="dark"]{
   --bg-default:#0c0d11; --bg-surface:#1c1d24; --bg-elevated:#2e3040;
   --text-primary:#f5f0e8; --text-secondary:#a89e8c;
   --border-default:#2e3040; --border-strong:#4a4840;
-  --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040;
+  --ink-gold:#ffcb45; --action-tint:#3d2e08; --grid:#2e3040; --danger:#ff8a7a;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -98,6 +99,7 @@ section{padding-block:clamp(64px,10vw,112px)}
 .btn-primary:active{transform:translateY(1px)}
 .btn-quiet{color:var(--text-primary);border-color:var(--border-strong)}
 .btn-quiet:hover{border-color:var(--text-secondary)}
+button.btn-quiet{background:none}
 /* CatEarShape.tsx: two ears on the pill, tips leaning outward. Used sparingly, as in the app. */
 /* Τα αυτιά είναι position:absolute και δεν πιάνουν χώρο. ΚΑΝΕΝΑ margin εδώ: σε flex γραμμή με
    align-items:center, ένα margin-top 11px κατέβαζε το κουμπί ~5,5px κάτω από το διπλανό του. */
@@ -369,6 +371,21 @@ section{padding-block:clamp(64px,10vw,112px)}
 .form input:focus,.form select:focus,.form textarea:focus{outline:3px solid var(--action-primary);outline-offset:2px;border-color:var(--action-primary)}
 .form .btn{justify-self:start;margin-top:4px;min-width:180px;justify-content:center}
 button.btn{cursor:pointer}
+button.btn:disabled{opacity:.6;cursor:progress}
+[hidden]{display:none !important}
+/* Bots fill in every field; people never see this one, so anything typed in it is a bot. */
+.hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.form-status{margin:0;min-height:1.5em;font-size:15px;line-height:22px;color:var(--text-secondary)}
+.form-status.err{color:var(--danger)}
+.form-status a{color:inherit}
+/* After sending: the form steps aside for a short thank-you. */
+.sent{width:100%;max-width:520px;display:grid;justify-items:center;gap:10px;padding:32px 26px;margin-top:8px;
+  background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--r-xl);text-align:center}
+.sent:focus{outline:none}
+.sent-check{width:56px;height:56px;border-radius:50%;background:var(--action-primary);display:grid;place-items:center;margin-bottom:6px}
+.sent-check svg{width:28px;height:28px;fill:var(--on-action)}
+.sent-title{font-family:var(--serif);font-weight:700;font-size:26px;line-height:32px}
+.sent .btn{margin-top:12px}
 
 /* ---------- final cta ---------- */
 .final{text-align:center}
@@ -887,10 +904,10 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
     <svg class="mascot" viewBox="0 0 256 256" aria-hidden="true"><g data-ink="cat" data-seed="5" data-color="#ecb72c" data-light="var-bg"></g></svg>
     <h2 id="join-title">Know a cat on your street?</h2>
     <p class="lede">Tell us a little about you and we will get back to you.</p>
-    <form class="form" action="mailto:hello@catchcats.me?subject=CatsMe%20contact" method="post" enctype="text/plain">
+    <form class="form" id="contact-form" action="https://yayrtrosbzhexfgzkrwj.supabase.co/functions/v1/contact" method="post">
       <div class="form-row">
-        <label>Name <input name="name" type="text" required autocomplete="name"></label>
-        <label>Email <input name="email" type="email" required autocomplete="email"></label>
+        <label>Name <input name="name" type="text" required maxlength="100" autocomplete="name"></label>
+        <label>Email <input name="email" type="email" required maxlength="200" autocomplete="email"></label>
       </div>
       <label>Topic
         <select name="topic" id="topic">
@@ -901,9 +918,17 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
           <option value="other">Something else</option>
         </select>
       </label>
-      <label>Message <textarea name="message" rows="4" required></textarea></label>
+      <label>Message <textarea name="message" rows="4" required maxlength="4000"></textarea></label>
+      <div class="hp" aria-hidden="true"><label>Leave this empty <input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
       <button class="btn btn-primary ears" type="submit">Send message</button>
+      <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
     </form>
+    <div class="sent" id="sent" tabindex="-1" hidden>
+      <span class="sent-check" aria-hidden="true"><svg viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span>
+      <p class="sent-title">Thank you<span data-sent-name></span>!</p>
+      <p class="muted">Your message is with us.<span data-sent-to> We will write back to <b data-sent-email></b>.</span></p>
+      <button class="btn btn-quiet" type="button" id="send-another">Send another message</button>
+    </div>
     <p class="sign">Every street cat deserves a name.</p>
   </div>
 </section>
@@ -1267,6 +1292,51 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
   var sel=document.getElementById('topic');
   document.querySelectorAll('a[href="#contact"]').forEach(function(a){
     a.addEventListener('click',function(){ if(sel) sel.value=a.getAttribute('data-topic')||'early access'; });
+  });
+})();
+</script>
+<script>
+/* The contact form posts to the `contact` Edge Function (supabase/functions/contact in the app
+   repo), which saves the message and mails it to us. Without scripts the browser posts the form
+   itself and the function sends it back here with ?sent=ok or ?sent=error. */
+(function(){
+  var form=document.getElementById('contact-form'), sent=document.getElementById('sent');
+  if(!form||!sent) return;
+  var btn=form.querySelector('button[type="submit"]'), status=document.getElementById('form-status'), label=btn.textContent;
+  var FAIL='We could not send it. Please try again, or email <a href="mailto:hello@catchcats.me">hello@catchcats.me</a>.';
+  function say(html,err){ status.innerHTML=html; status.classList.toggle('err',!!err); }
+  function thanks(name,email){
+    sent.querySelector('[data-sent-name]').textContent=name?', '+name.trim().split(/\s+/)[0]:'';
+    sent.querySelector('[data-sent-email]').textContent=email||'';
+    sent.querySelector('[data-sent-to]').hidden=!email;
+    form.hidden=true; sent.hidden=false; sent.focus();
+  }
+  var back=new URLSearchParams(location.search).get('sent');
+  if(back){
+    history.replaceState(null,'',location.pathname+'#contact');
+    if(back==='ok') thanks('',''); else say(FAIL,true);
+  }
+  form.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var data={}; new FormData(form).forEach(function(v,k){ data[k]=v; });
+    btn.disabled=true; btn.setAttribute('aria-busy','true'); btn.textContent='Sending\u2026'; say('');
+    fetch(form.action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(b){ return {code:r.status,body:b}; }); })
+      .then(function(r){
+        if(r.code<300){ form.reset(); thanks(data.name,data.email); return; }
+        if(r.code===400){
+          var fields=r.body.fields||[];
+          say('Please check your '+(fields.length?fields.join(', '):'details')+'.',true);
+          var first=fields[0]&&form.elements.namedItem(fields[0]); if(first) first.focus();
+        } else if(r.code===429){
+          say('That is a lot of messages in a few minutes. Please try again shortly.',true);
+        } else say(FAIL,true);
+      })
+      .catch(function(){ say(FAIL,true); })
+      .then(function(){ btn.disabled=false; btn.removeAttribute('aria-busy'); btn.textContent=label; });
+  });
+  document.getElementById('send-another').addEventListener('click',function(){
+    sent.hidden=true; form.hidden=false; say(''); form.elements.namedItem('name').focus();
   });
 })();
 </script>
