@@ -362,12 +362,15 @@ button.btn-quiet{background:none}
 /* Our team */
 .team-grid{display:grid;gap:18px;margin-top:40px;grid-template-columns:1fr}
 @media (min-width:640px){.team-grid{grid-template-columns:repeat(2,1fr)}}
-.member{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--r-xl);padding:26px;display:flex;align-items:center;gap:18px}
+.member{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--r-xl);padding:24px 26px;display:flex;align-items:center;gap:22px}
 .member h3{font-size:20px;line-height:26px}
 .member-link{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:14px;font-weight:700;color:var(--ink-gold)}
 .member-link svg{width:15px;height:15px;flex:none}
 /* Cut-out portraits from lifepulse.gr/team, on the brand gold, cropped head and shoulders. */
-.avatar{flex:none;width:80px;height:80px;border-radius:50%;background:var(--action-primary);object-fit:cover}
+/* Real photos of the two of us, each with a street cat, dropped in a polaroid like Luna's. */
+.avatar{flex:none;width:112px;height:auto;border-radius:3px;box-shadow:0 10px 20px rgba(12,13,17,.28);background:#fbf8f3}
+.member:nth-child(1) .avatar{transform:rotate(-4deg)}
+.member:nth-child(2) .avatar{transform:rotate(3deg)}
 
 /* Contact form */
 .form{width:100%;max-width:520px;display:grid;gap:14px;text-align:left;margin-top:8px}
@@ -902,8 +905,8 @@ footer{border-top:1px solid var(--border-default);padding-block:36px;font-size:1
       <h2 id="team-title">The people behind CatsMe.</h2>
     </div>
     <div class="team-grid">
-      <article class="member"><img class="avatar" src="assets/team/panos-karadaglis.png" alt="" width="240" height="240" loading="lazy"><div><h3>Panos Karadaglis</h3><p class="muted">Product, design &amp; engineering</p><a class="member-link" href="https://www.linkedin.com/in/panagiotis-karadaglis/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>LinkedIn</a></div></article>
-      <article class="member"><img class="avatar" src="assets/team/katerina-gianniki.png" alt="" width="240" height="240" loading="lazy"><div><h3>Katerina Gianniki</h3><p class="muted">Graphic design</p><a class="member-link" href="https://www.instagram.com/katgiannik/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>Instagram</a></div></article>
+      <article class="member"><img class="avatar" src="assets/team/panos-polaroid.png" alt="Panos holding up a rescued kitten" width="980" height="1100" loading="lazy"><div><h3>Panos Karadaglis</h3><p class="muted">Product, design &amp; engineering</p><a class="member-link" href="https://www.linkedin.com/in/panagiotis-karadaglis/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>LinkedIn</a></div></article>
+      <article class="member"><img class="avatar" src="assets/team/katerina-polaroid.png" alt="Katerina meeting a street cat" width="980" height="885" loading="lazy"><div><h3>Katerina Gianniki</h3><p class="muted">Graphic design</p><a class="member-link" href="https://www.instagram.com/katgiannik/" target="_blank" rel="noopener"><svg viewBox="-1.5 -1.5 27 27" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>Instagram</a></div></article>
     </div>
   </div>
 </section>
